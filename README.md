@@ -18,29 +18,6 @@ External media player applications (like Kodi) can be customized so that game en
 * Active NHL.TV subscription is needed
 * Same geo-blocking restrictions affect use of this application as using NHL.TV in general
 
-## Installation
-### Method 1: Download released binaries and install dependencies
-Download the compiled binary files from [Releases](https://github.com/rhdpin/nhltv-fetcher/releases). Then you can install the [Streamlink](https://github.com/streamlink/streamlink) according to its installation instructions. nhltv-fetcher assumes that `streamlink` executable can be found from PATH. 
-
-Create `auth.json` in same directory where nhltv-fetcher executable is. Content should define NHL.TV account information (email and password).
-
-`{ "email": "my_nhltv_account_emailaddress", "password": "my_nhltv_account_password" }`
-
-### Method 2: Docker
-[Docker](https://www.docker.com/) container contains full setup, so no installation of Streamlink is needed. 
-
-1. Install Docker if not already installed
-2. Create `auth.json` in suitable directory (e.g. `/home/user/.nhltv-fetcher`). Content should define NHL.TV account information (email and password)
-
-`{ "email": "my_nhltv_account_emailaddress", "password": "my_nhltv_account_password" }`
-
-3. Run the container with command like: 
-`docker run -it --rm -v /mnt/download:/app/download -v /home/user/.nhltv-fetcher:/app/config --network=host rhdpin/nhltv-fetcher:linux-x64 -c -p /app/download -a /app/config`
-
-First `-v` parameter binds download folder from host to container. In the example host folder is `/mnt/download` and it's mapped to `/app/download` in container. Second `-v` parameter binds config folder from host to container. In the example command host folder is `/home/user/.nhltv-fetcher` and it's mapped to `/app/config` in container to read the authentication file. 
-
-`rhdpin/nhltv-fetcher:linux-x64` is the image name to be used. Replace `linux-x64` with `linux-arm32v7` to get a image for ARMv7 device like Raspberry Pi. Rest of the parameters are for the nhltv-fetcher itself.
-
 ## Usage
 ```
 $ ./nhltv-fetcher --help
@@ -127,10 +104,6 @@ Feed found: 12/16/2022 TOR@NYR (AWAY)
 Writing stream to file: 524 MB (11.6 MB/s)
 ```
 Using parameter `-l` or `--play` to open the feed directly in VLC assumes that VLC is installed and the executable can be found from PATH environment variable.
-## Releases
-All release packages contain all needed files, so installation of .NET runtime is not needed. 
-
-After extracting the files on Linux, run `chmod +x nhltv-fetcher` to make the application executable.
 
 ## Credits
 Kodi NHL.TV plugin ([eracknaphobia/plugin.video.nhlgcl](https://github.com/eracknaphobia/plugin.video.nhlgcl))) for the authentication approach.
