@@ -37,7 +37,7 @@ jobs:
       run: |
         tag=$(git describe --tags --abbrev=0)
         release_name="nhltv-fetcher-${{ matrix.target }}"        
-        dotnet publish src/ --runtime "${{ matrix.target }}" --self-contained -c Release -o "$release_name" /p:PublishTrimmed=true /p:TrimMode=Link
+        dotnet publish src/ --runtime "${{ matrix.target }}" --self-contained -c Release -o "$release_name" -p:PublishTrimmed=true -p:TrimMode=Link
         if [ "${{ matrix.target }}" == "win-x64" ]; then
           # Pack to zip for Windows
           7z a -tzip "${release_name}.zip" "./${release_name}/*"
