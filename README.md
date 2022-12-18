@@ -41,7 +41,7 @@ MacOS: Newer MacOS operating systems complain that Apple can't check that the bi
 3. Run the container with command like: 
 `docker run -it --rm -v /mnt/download:/app/download -v /home/user/.nhltv-fetcher:/app/config --network=host rhdpin/nhltv-fetcher:linux-x64 -c -p /app/download -a /app/config/auth.json`
 
-First `-v` parameter binds download folder from host to container. In the example host folder is `/mnt/download` and it's mapped to `/app/download` in container. Second `-v` parameter binds config folder from host to container. In the example command host folder is `/home/user/.nhltv-fetcher` and it's mapped to `/app/config` in container to read the authentication file. 
+First `-v` parameter binds download folder from host to container. In the example host folder is `/mnt/download` and it's mapped to `/app/download` in container. Second `-v` parameter binds config folder from host to container. In the example command host folder is `/home/user/.nhltv-fetcher` and it's mapped to `/app/config/auth.json` in container to read the authentication file. 
 
 `rhdpin/nhltv-fetcher:linux-x64` is the image name to be used. Replace `linux-x64` with `linux-arm32v7` to get a image for ARMv7 device like Raspberry Pi. Rest of the parameters are for the nhltv-fetcher itself.
 
