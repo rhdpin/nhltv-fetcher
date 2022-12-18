@@ -117,7 +117,7 @@ namespace NhlTvFetcher
                     }
                     catch (Exception e)
                     {
-                        _messenger.WriteLine($"Could not start downloader '{StreamLinkAppName}': {e.Message}. Ensure that the downloader application is located in current directory or $PATH.");
+                        _messenger.WriteLine($"Could not start Streamlink '{StreamLinkAppName}': {e.Message}. Ensure that the Streamlink (https://streamlink.github.io/install.html) application is installed and located in current directory or $PATH.");
                         return;
                     }
 
