@@ -1,9 +1,9 @@
 # nhltv-fetcher
-Helps NHL.TV subscribers to download game feeds or view them with VLC. It allows watching games offline and/or with external media player applications.
+Helps NHL.TV subscribers to download game feeds or view them with VLC. Downloading the games allows watching games offline and/or with external media player applications.
 
-Main problem with official NHL.TV player user interfaces (web, mobile, TV) is that they are not good when watching games afterwards and trying to not get spoiled. NHL.TV apps allow to hide scores, but stream timeline is still shown, especially when skipping intermissions and ads. It is most problematic during the playoffs, when timeline reveals if game went to OT and how long it lasted. Kodi, for example, can be customized to not show timeline when watching videos.
+Main problem with official NHL.TV player user interfaces (web, mobile, TV) is that they are not good when watching games afterwards and trying to not get spoiled. NHL.TV apps allow to hide scores, but the timeline is still shown, especially when skipping intermissions and ads. It is most problematic during the playoffs, when timeline reveals if game went to OT and how long it lasted. 
 
-The application does not help to watch NHL games for free.
+External media player applications (like Kodi) can be customized so that game end time is not shown.
 
 ## Features
 * Made with .NET 6.0 / C#
