@@ -36,9 +36,9 @@ Executable is located in `src\bin\Debug\net6.0\`.
 MacOS: Newer MacOS operating systems complain that Apple can't check if the binary files are malicious. The following command (in directory where binaries were extracted) to make Mac treat the files as safe:
 `xattr -d com.apple.quarantine *`
 ### Method 3: Docker
-[Docker](https://www.docker.com/) container contains full setup, so no installation of Streamlink is needed. 
+[Docker image](https://hub.docker.com/repository/docker/rhdpin/nhltv-fetcher) contains full setup, so no installation of Streamlink is needed. 
 
-1. Install Docker if not already installed
+1. [Install Docker](https://docs.docker.com/engine/install/) if not already installed
 2. Create [authentication file](#authentication-file) in suitable directory (e.g. `/home/user/.nhltv-fetcher/auth.json`)
 3. Run the container with command like: 
 `docker run -it --rm -v /mnt/download:/app/download -v /home/user/.nhltv-fetcher:/app/config --network=host rhdpin/nhltv-fetcher:linux-x64 -c -p /app/download -a /app/config/auth.json`
