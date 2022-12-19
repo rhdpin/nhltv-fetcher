@@ -19,31 +19,38 @@ External media player applications (like Kodi) can be customized so that game en
 * Same geo-blocking restrictions affect use of this application as using NHL.TV in general
 
 ## Installation
-### Method 1: Download released binaries and install dependencies
-Download the compiled binary files from [Releases](https://github.com/rhdpin/nhltv-fetcher/releases). 
+### Method 1: Build the sources
+1. [Install .NET Framework SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+2. [Install Streamlink](https://github.com/streamlink/streamlink). `nhltv-fetcher` assumes that `streamlink` executable can be found from PATH. 
+3. Clone the repo: `git clone https://github.com/rhdpin/nhltv-fetcher`
+4. Build (in `src/` directory): `dotnet build`
+5. Create [authentication file](#authentication-file) (`src\bin\Debug\net6.0\auth.json`)
 
-Then you can install the [Streamlink](https://github.com/streamlink/streamlink) according to its installation instructions. nhltv-fetcher assumes that `streamlink` executable can be found from PATH. 
+Executable is located in `src\bin\Debug\net6.0\`.
 
-Create `auth.json` in same directory where nhltv-fetcher executable is. Content should define NHL.TV account information (email and password).
+### Method 2: Download released binaries and install dependencies
+1. Download and extract the compiled binary files from [Releases](https://github.com/rhdpin/nhltv-fetcher/releases)
+2. [Install Streamlink](https://github.com/streamlink/streamlink). nhltv-fetcher assumes that `streamlink` executable can be found from PATH. 
+3. Create [authentication file](#authentication-file) in same directory where `nhltv-fetcher` executable is. 
 
-`{ "email": "my_nhltv_account_emailaddress", "password": "my_nhltv_account_password" }`
-
-MacOS: Newer MacOS operating systems complain that Apple can't check that the binary files not malicious. You can run the following command (in directory where binaries were extracted) to make Mac treat the files as safe:
+MacOS: Newer MacOS operating systems complain that Apple can't check if the binary files are malicious. The following command (in directory where binaries were extracted) to make Mac treat the files as safe:
 `xattr -d com.apple.quarantine *`
-### Method 2: Docker
+### Method 3: Docker
 [Docker](https://www.docker.com/) container contains full setup, so no installation of Streamlink is needed. 
 
 1. Install Docker if not already installed
-2. Create `auth.json` in suitable directory (e.g. `/home/user/.nhltv-fetcher`). Content should define NHL.TV account information (email and password)
-
-`{ "email": "my_nhltv_account_emailaddress", "password": "my_nhltv_account_password" }`
-
+2. Create [authentication file](#authentication-file) in suitable directory (e.g. `/home/user/.nhltv-fetcher/auth.json`)
 3. Run the container with command like: 
 `docker run -it --rm -v /mnt/download:/app/download -v /home/user/.nhltv-fetcher:/app/config --network=host rhdpin/nhltv-fetcher:linux-x64 -c -p /app/download -a /app/config/auth.json`
 
 First `-v` parameter binds download folder from host to container. In the example host folder is `/mnt/download` and it's mapped to `/app/download` in container. Second `-v` parameter binds config folder from host to container. In the example command host folder is `/home/user/.nhltv-fetcher` and it's mapped to `/app/config/auth.json` in container to read the authentication file. 
 
-`rhdpin/nhltv-fetcher:linux-x64` is the image name to be used. Replace `linux-x64` with `linux-arm32v7` to get a image for ARMv7 device like Raspberry Pi. Rest of the parameters are for the nhltv-fetcher itself.
+`rhdpin/nhltv-fetcher:linux-x64` is the image name to be used. Replace `linux-x64` with `linux-arm32v7` to get a image for ARMv7 device like Raspberry Pi. Rest of the parameters are for `nhltv-fetcher` itself.
+
+### Authentication file
+Authentication file (`auth.json`) must contain valid NHL.TV account email and password. Application can not be used without it.
+
+`{ "email": "my_nhltv_account_emailaddress", "password": "my_nhltv_account_password" }`
 
 ## Usage
 ```
