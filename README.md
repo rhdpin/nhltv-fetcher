@@ -55,7 +55,7 @@ Authentication file (`auth.json`) must contain valid NHL.TV account email and pa
 ## Usage
 ```
 $ ./nhltv-fetcher --help
-nhltv-fetcher 1.0.0
+nhltv-fetcher 1.0.1
 Copyright (C) 2022 rhdpin
 
   -a, --auth-file-path    (Default: auth.json in current directory) Set full path of auth file
@@ -92,49 +92,55 @@ Copyright (C) 2022 rhdpin
 Choose the feed from list of found feeds and download it in `/mnt/download`
 ```
 $ ./nhltv-fetcher -c -p /mnt/download
-nhltv-fetcher 1.0.0
+nhltv-fetcher 1.0.1
 
- 1: 12/16/2022 LAK@BOS (HOME)
- 2: 12/16/2022 LAK@BOS (AWAY)
- 3: 12/16/2022 SEA@CAR (AWAY)
- 4: 12/16/2022 PIT@FLA (HOME)
- 5: 12/16/2022 PIT@FLA (AWAY)
- 6: 12/16/2022 ANA@MTL (AWAY)
- 7: 12/16/2022 PHI@NJD (HOME)
- 8: 12/16/2022 PHI@NJD (AWAY)
- 9: 12/16/2022 TOR@NYR (AWAY)
-10: 12/16/2022 CBJ@TBL (HOME)
-11: 12/16/2022 CBJ@TBL (AWAY)
-12: 12/16/2022 DAL@WSH (HOME)
-13: 12/16/2022 DAL@WSH (AWAY)
-14: 12/16/2022 NSH@WPG (HOME)
-15: 12/16/2022 NSH@WPG (AWAY)
-16: 12/16/2022 VGK@CHI (HOME)
-17: 12/16/2022 VGK@CHI (AWAY)
-18: 12/16/2022 BUF@COL (AWAY)
-19: 12/16/2022 STL@EDM (AWAY)
-20: 12/17/2022 CHI@MIN (NATIONAL)
-21: 12/17/2022 STL@CGY (NATIONAL)
-22: 12/17/2022 STL@CGY (AWAY)
-23: 12/17/2022 NYI@ARI (HOME)
-24: 12/17/2022 NYI@ARI (AWAY)
+ 1: Tue 22-12-27 CHI@CAR (home, BSSO)
+ 2: Tue 22-12-27 CHI@CAR (away, NBCSCH)
+ 3: Tue 22-12-27 BOS@OTT (home, TSN5)
+ 4: Tue 22-12-27 BOS@OTT (away, NESN)
+ 5: Tue 22-12-27 BOS@OTT (home, French, RDS)
+ 6: Tue 22-12-27 WSH@NYR (away, NBCSWA+)
+ 7: Tue 22-12-27 PIT@NYI (home, MSGSN)
+ 8: Tue 22-12-27 PIT@NYI (away, ATTSN-PT)
+ 9: Tue 22-12-27 MIN@WPG (home, TSN3)
+10: Tue 22-12-27 MIN@WPG (away, BSN/BSWI)
+11: Tue 22-12-27 TOR@STL (home, BSMW)
+12: Tue 22-12-27 DAL@NSH (home, BSSO)
+13: Tue 22-12-27 DAL@NSH (away, BSSWX)
+14: Tue 22-12-27 COL@ARI (home, BSAZX)
+15: Tue 22-12-27 COL@ARI (away, ALT2)
+16: Tue 22-12-27 EDM@CGY (national, SNE/SNW)
+17: Tue 22-12-27 SJS@VAN (home, SNP)
+18: Tue 22-12-27 SJS@VAN (away, NBCSCA)
+19: Tue 22-12-27 VGK@LAK (home, BSW)
+20: Tue 22-12-27 VGK@LAK (away, ATTSN-RM)
+21: Wed 22-12-28 MTL@TBL (home, BSSUNX)
+22: Wed 22-12-28 MTL@TBL (national, SN)
+23: Wed 22-12-28 MTL@TBL (away, French, RDS)
+24: Wed 22-12-28 DET@PIT (home, ATTSN-PT)
+25: Wed 22-12-28 DET@PIT (away, BSDET)
+26: Wed 22-12-28 BOS@NJD (national, TNT)
+27: Wed 22-12-28 CGY@SEA (national, TNT)
+28: Wed 22-12-28 CGY@SEA (away, SNW)
+29: Wed 22-12-28 VGK@ANA (home, BSSC)
+30: Wed 22-12-28 VGK@ANA (away, ATTSN-RM)
 
-Choose feed (q to quit): 9
+Choose feed (q to quit): 20
 Logging in...
 Getting the feed...
 
-Downloading feed: 12/16/2022 TOR@NYR (AWAY)
+Downloading feed: Tue 22-12-27 VGK@LAK (away, ATTSN-RM)
 Writing stream to file: 364 MB (10.4 MB/s)
 ```
 Get latest game of your favorite team. It tries to get feed of chosen team (away/home) if available, otherwise it uses first feed found. It's useful also when making scheduled calls (e.g. daily) to application to automatically load latest game. 
 ```
 $ ./nhltv-fetcher -t NYR -p /mnt/download
-nhltv-fetcher 1.0.0
+nhltv-fetcher 1.0.1
 
-Fetching latest feed for 'NYR'...
+Fetching latest feed for 'DAL'...
 Logging in...
 Getting the feed...
-Feed found: 12/16/2022 TOR@NYR (AWAY)
+Feed found: Tue 22-12-27 DAL@NSH (away, BSSWX)
 Writing stream to file: 524 MB (11.6 MB/s)
 ```
 Using parameter `-l` or `--play` to open the feed directly in VLC assumes that VLC is installed and the executable can be found from PATH environment variable.
