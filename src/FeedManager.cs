@@ -135,7 +135,8 @@ namespace NhlTvFetcher
         {            
             var formattedDate = feed.Date.Replace("/", "-");
             var formattedBroadcaster = feed.Broadcaster?.Replace("/", "_");
-            return Path.Combine(directoryPath ?? "", $"{formattedDate}-{feed.Away}@{feed.Home}-{feed.Type}{(feed.IsFrench ? "-French" : "")}{(formattedBroadcaster != null ? "-" + formattedBroadcaster : "")}.mp4");
+            return Path.Combine(directoryPath ?? "", 
+                $"{formattedDate}-{feed.Away}@{feed.Home}-{feed.Type}{(feed.IsFrench ? "-French" : "")}{(formattedBroadcaster != null ? "-" + formattedBroadcaster : "")}.mp4");
         }
 
         private static string GetFeedDisplayName(Feed feed)
