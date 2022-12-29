@@ -205,7 +205,7 @@ namespace NhlTvFetcher
                         {
                             Home = game.homeCompetitor.shortName,
                             Away = game.awayCompetitor.shortName,                            
-                            Date = game.startTime.ToShortDateString(),
+                            Date = broadcaster != null ? broadcaster.Date : game.startTime,
                             Id = idCounter,
                             MediaId = content.id.ToString(),
                             Type = broadcaster != null ? broadcaster.Type : content.clientContentMetadata[0].name.ToLower(),
