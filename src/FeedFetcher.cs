@@ -45,11 +45,11 @@ namespace NhlTvFetcher
 
             Feed chosenFeed;
             if (isHomeTeam)
-                chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("home", StringComparison.OrdinalIgnoreCase));
+                chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("home", StringComparison.OrdinalIgnoreCase) && !f.IsFrench);
             else
-                chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("away", StringComparison.OrdinalIgnoreCase));
+                chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("away", StringComparison.OrdinalIgnoreCase) && !f.IsFrench);
 
-            chosenFeed ??= latestStreams.FirstOrDefault();
+            chosenFeed ??= latestStreams.FirstOrDefault(f => !f.IsFrench);
 
             return chosenFeed;
         }
