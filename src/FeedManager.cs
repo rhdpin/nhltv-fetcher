@@ -38,7 +38,7 @@ namespace NhlTvFetcher
 
             foreach (var feed in feeds)
             {
-                Console.WriteLine($"{feed.Id.ToString().PadLeft(2)}: {GetFeedDisplayName(feed)}");
+                Console.WriteLine($"{feed.Id,2}: {GetFeedDisplayName(feed)}");
             }
 
             if (!feeds.Any())
@@ -133,15 +133,15 @@ namespace NhlTvFetcher
 
         private static string GetTargetFileName(Feed feed, string directoryPath)
         {            
-            var formattedDate = feed.Date.Replace("/", "-");
+            var formattedDate = feed.Date.ToString("yy-MM-dd").Replace("/", "-");
             var formattedBroadcaster = feed.Broadcaster?.Replace("/", "_");
             return Path.Combine(directoryPath ?? "", 
                 $"{formattedDate}-{feed.Away}@{feed.Home}-{feed.Type}{(feed.IsFrench ? "-French" : "")}{(formattedBroadcaster != null ? "-" + formattedBroadcaster : "")}.mp4");
         }
 
         private static string GetFeedDisplayName(Feed feed)
-        {
-            return $"{feed.Date} {feed.Away}@{feed.Home} ({feed.Type}{(feed.IsFrench ? ", French" : "")}{(feed.Broadcaster != null ? ", " + feed.Broadcaster : "")})";
+        {            
+            return $"{feed.Date.ToString("ddd yy-MM-dd")} {feed.Away}@{feed.Home} ({feed.Type}{(feed.IsFrench ? ", French" : "")}{(feed.Broadcaster != null ? ", " + feed.Broadcaster : "")})";
         }
     }
 }
