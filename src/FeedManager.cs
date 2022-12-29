@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using NhlTvFetcher.Data;
 using System.Net;
+using NhlTvFetcher.Models.Json.ScheduleBroadcast;
 
 namespace NhlTvFetcher
 {
@@ -37,7 +38,7 @@ namespace NhlTvFetcher
 
             foreach (var feed in feeds)
             {
-                Console.WriteLine($"{feed.Id.ToString().PadLeft(2)}: {feed.Date} {feed.Away}@{feed.Home} ({feed.Type})");
+                Console.WriteLine($"{feed.Id.ToString().PadLeft(2)}: {GetFeedDisplayName(feed)}");
             }
 
             if (!feeds.Any())
@@ -72,13 +73,11 @@ namespace NhlTvFetcher
                 Console.WriteLine(streamUrl);
                 return;
             }
-                        
-
             if (streamUrl != null)
             {
-                _messenger.WriteLine($"\nDownloading feed: {chosenFeed.Date} {chosenFeed.Away}@{chosenFeed.Home} ({chosenFeed.Type})");
+                _messenger.WriteLine($"\nDownloading feed: {GetFeedDisplayName(chosenFeed)}");
                 Download(streamUrl, chosenFeed, targetPath);
-            }            
+            }
         }
 
         public void GetLatest(string teamName, string targetPath, bool getOnlyUrl)
@@ -113,7 +112,7 @@ namespace NhlTvFetcher
 
             if (streamUrl != null)
             {
-                _messenger.WriteLine($"Feed found: {feed.Date} {feed.Away}@{feed.Home} ({feed.Type})");
+                _messenger.WriteLine($"Feed found: {GetFeedDisplayName(feed)}");
                 Download(streamUrl, feed, targetPath);
             }            
         }               
@@ -135,7 +134,13 @@ namespace NhlTvFetcher
         private static string GetTargetFileName(Feed feed, string directoryPath)
         {            
             var formattedDate = feed.Date.Replace("/", "-");
-            return Path.Combine(directoryPath ?? "", $"{formattedDate}-{feed.Away}@{feed.Home}-{feed.Type}.mp4");
+            var formattedBroadcaster = feed.Broadcaster?.Replace("/", "_");
+            return Path.Combine(directoryPath ?? "", $"{formattedDate}-{feed.Away}@{feed.Home}-{feed.Type}{(feed.IsFrench ? "-French" : "")}{(formattedBroadcaster != null ? "-" + formattedBroadcaster : "")}.mp4");
+        }
+
+        private static string GetFeedDisplayName(Feed feed)
+        {
+            return $"{feed.Date} {feed.Away}@{feed.Home} ({feed.Type}{(feed.IsFrench ? ", French" : "")}{(feed.Broadcaster != null ? ", " + feed.Broadcaster : "")})";
         }
     }
 }

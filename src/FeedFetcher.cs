@@ -1,4 +1,6 @@
 ﻿using NhlTvFetcher.Data;
+using NhlTvFetcher.Models;
+using NhlTvFetcher.Models.Json;
 using NhlTvFetcher.Models.Json.Schedule;
 using System;
 using System.Collections.Generic;
@@ -165,7 +167,7 @@ namespace NhlTvFetcher
         public IEnumerable<Feed> GetFeeds(DateTime start, DateTime end)
         {
             var schedule = GetSchedule(start, end);
-
+            var broadcasts = GetBroadcasters(start, end);
             var feeds = new List<Feed>();
             int idCounter = 1;
 
@@ -177,20 +179,40 @@ namespace NhlTvFetcher
                     {
                         if (content.clientContentMetadata.Length == 0 || !content.clientContentMetadata[0].name.Equals("home", StringComparison.OrdinalIgnoreCase) &&
                                 !content.clientContentMetadata[0].name.Equals("away", StringComparison.OrdinalIgnoreCase) &&
-                                !content.clientContentMetadata[0].name.Equals("national", StringComparison.OrdinalIgnoreCase))
+                                !content.clientContentMetadata[0].name.Equals("national", StringComparison.OrdinalIgnoreCase) &&
+                                !content.clientContentMetadata[0].name.Equals("french", StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
 
+                        var allBroadcasters = broadcasts.Where(b => b.HomeTeam.Equals(game.homeCompetitor.name, StringComparison.OrdinalIgnoreCase)
+                                && b.AwayTeam.Equals(game.awayCompetitor.name, StringComparison.OrdinalIgnoreCase));
+
+                        if (content.clientContentMetadata[0].name.Equals("french", StringComparison.OrdinalIgnoreCase))
+                        {
+                            allBroadcasters = allBroadcasters.Where(b => b.Language.Equals("fr", StringComparison.OrdinalIgnoreCase));
+                        }
+                        else
+                        {
+                            allBroadcasters = allBroadcasters.Where(b => b.Language.Equals("en", StringComparison.OrdinalIgnoreCase) && 
+                                b.Type.Equals(content.clientContentMetadata[0].name, StringComparison.OrdinalIgnoreCase));
+                        }                         
+                        
+                        var broadcaster = allBroadcasters.Any() ? allBroadcasters.First() : null;
+                        var broadcasterString = allBroadcasters.Any() ? string.Join('/', allBroadcasters.Select(b => b.Name).ToArray()) : null;
+
                         var feed = new Feed()
                         {
                             Home = game.homeCompetitor.shortName,
-                            Away = game.awayCompetitor.shortName,
+                            Away = game.awayCompetitor.shortName,                            
                             Date = game.startTime.ToShortDateString(),
                             Id = idCounter,
                             MediaId = content.id.ToString(),
-                            Type = content.clientContentMetadata[0].name
+                            Type = broadcaster != null ? broadcaster.Type : content.clientContentMetadata[0].name.ToLower(),
+                            Broadcaster = broadcasterString,
+                            IsFrench = content.clientContentMetadata[0].name.Equals("french", StringComparison.OrdinalIgnoreCase)
                         };
+
                         feeds.Add(feed);
                         idCounter++;
                     }
@@ -198,6 +220,65 @@ namespace NhlTvFetcher
             }
             
             return feeds;
+        }
+
+        private List<Broadcast> GetBroadcasters(DateTime start, DateTime end)
+        {
+            string startDate, endDate;
+            var broadcasts = new List<Broadcast>();
+
+            startDate = start.ToString("yyyy-MM-dd");
+            endDate = end.ToString("yyyy-MM-dd");
+
+            try
+            {
+                string schedulerUrl = "https://statsapi.web.nhl.com/api/v1/schedule?startDate=" + startDate + "&endDate=" + endDate
+                    + "&expand=schedule.teams,schedule.linescore,schedule.broadcasts.all";
+                _messenger.WriteLine($"Trying to get NHL schedule data from {schedulerUrl}", MessageCategory.Verbose);
+                Models.Json.ScheduleBroadcast.RootObject model;
+
+                using (var webClient = new System.Net.WebClient())
+                {
+                    var json = webClient.DownloadString(schedulerUrl);
+
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                        WriteIndented = true
+                    };
+
+                    model = JsonSerializer.Deserialize<Models.Json.ScheduleBroadcast.RootObject>(json, options);
+                }
+
+                foreach (var date in model.Dates)
+                {
+                    foreach (var game in date.Games)
+                    {
+                        if (game.Broadcasts != null)
+                        {
+                            foreach (var broadcastItem in game.Broadcasts)
+                            {
+                                var broadcast = new Broadcast()
+                                {
+                                    HomeTeam = game.Teams.Home.Team.Name,
+                                    AwayTeam = game.Teams.Away.Team.Name,
+                                    Type = broadcastItem.Type,
+                                    Name = broadcastItem.Name,
+                                    Date = DateTime.Parse(date.Date),
+                                    Language = broadcastItem.Language
+                                };
+                                broadcasts.Add(broadcast);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _messenger.WriteLine($"Getting broadcasts failed: {ex.Message}", MessageCategory.Verbose);
+            }
+
+            return broadcasts;
         }
     }
 }
