@@ -1,9 +1,11 @@
-﻿namespace NhlTvFetcher.Data
+﻿using System;
+
+namespace NhlTvFetcher.Data
 {
     public class Feed
     {
         public int Id { get; set; }
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         public string Home { get; set; }
         public string Away { get; set; }
         public string MediaId { get; set; }
