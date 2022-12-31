@@ -33,7 +33,7 @@ Executable is located in `src\bin\Debug\net6.0\`.
 2. [Install Streamlink](https://github.com/streamlink/streamlink). nhltv-fetcher assumes that `streamlink` executable can be found from PATH. 
 3. Create [authentication file](#authentication-file) in same directory where `nhltv-fetcher` executable is. 
 
-MacOS: Newer MacOS operating systems complain that Apple can't check if the binary files are malicious. The following command (in directory where binaries were extracted) to make Mac treat the files as safe:
+MacOS: Newer MacOS operating systems complain that Apple can't check if the binary files are malicious. The following command can be used (in directory where binaries were extracted) to make Mac treat the files as safe:
 `xattr -d com.apple.quarantine *`
 ### Method 3: Docker
 [Docker image](https://hub.docker.com/repository/docker/rhdpin/nhltv-fetcher) contains full setup, so no installation of Streamlink is needed. 
@@ -43,7 +43,7 @@ MacOS: Newer MacOS operating systems complain that Apple can't check if the bina
 3. Run the container with command like: 
 `docker run -it --rm -v /mnt/download:/app/download -v /home/user/.nhltv-fetcher:/app/config --network=host rhdpin/nhltv-fetcher:linux-x64 -c -p /app/download -a /app/config/auth.json`
 
-First `-v` parameter binds download folder from host to container. In the example host folder is `/mnt/download` and it's mapped to `/app/download` in container. Second `-v` parameter binds config folder from host to container. In the example command host folder is `/home/user/.nhltv-fetcher` and it's mapped to `/app/config/auth.json` in container to read the authentication file. 
+First `-v` parameter binds download folder from host to container. In the example host folder is `/mnt/download` and it's mapped to `/app/download` in container. Second `-v` parameter binds config folder from host to container. In the example command host folder is `/home/user/.nhltv-fetcher` and it's mapped to `/app/config` in container to read the authentication file. 
 
 `rhdpin/nhltv-fetcher:linux-x64` is the image name to be used. Replace `linux-x64` with `linux-arm32v7` to get a image for ARMv7 device like Raspberry Pi. Rest of the parameters are for `nhltv-fetcher` itself.
 
