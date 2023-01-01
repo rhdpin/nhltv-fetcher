@@ -134,7 +134,7 @@ Writing stream to file: 364 MB (10.4 MB/s)
 ```
 Get latest game of your favorite team. It tries to get feed of chosen team (away/home) if available, otherwise it uses first feed found. It's useful also when making scheduled calls (e.g. daily) to application to automatically load latest game. 
 ```
-$ ./nhltv-fetcher -t NYR -p /mnt/download
+$ ./nhltv-fetcher -t DAL -p /mnt/download
 nhltv-fetcher 1.0.1
 
 Fetching latest feed for 'DAL'...
