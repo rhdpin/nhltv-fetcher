@@ -1,6 +1,5 @@
 ﻿using NhlTvFetcher.Data;
 using NhlTvFetcher.Models;
-using NhlTvFetcher.Models.Json;
 using NhlTvFetcher.Models.Json.Schedule;
 using System;
 using System.Collections.Generic;
@@ -13,8 +12,7 @@ namespace NhlTvFetcher
 {
     public class FeedFetcher
     {
-        public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36";
-
+        public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36";        
         private readonly Messenger _messenger;
         private readonly Options _options;
 
@@ -177,25 +175,39 @@ namespace NhlTvFetcher
                 {
                     if (content.status.id == 4)
                     {
-                        if (content.clientContentMetadata.Length == 0 || !content.clientContentMetadata[0].name.Equals("home", StringComparison.OrdinalIgnoreCase) &&
+                        if (content.clientContentMetadata.Length == 0 || 
+                                !content.clientContentMetadata[0].name.Equals("home", StringComparison.OrdinalIgnoreCase) &&
                                 !content.clientContentMetadata[0].name.Equals("away", StringComparison.OrdinalIgnoreCase) &&
                                 !content.clientContentMetadata[0].name.Equals("national", StringComparison.OrdinalIgnoreCase) &&
+                                !content.clientContentMetadata[0].name.Equals("sportsnet", StringComparison.OrdinalIgnoreCase) &&
+                                !content.clientContentMetadata[0].name.Equals("tnt", StringComparison.OrdinalIgnoreCase) &&
+                                !content.clientContentMetadata[0].name.Equals("cbc", StringComparison.OrdinalIgnoreCase) &&
                                 !content.clientContentMetadata[0].name.Equals("french", StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
 
-                        var allBroadcasters = broadcasts.Where(b => b.HomeTeam.Equals(game.homeCompetitor.name, StringComparison.OrdinalIgnoreCase)
-                                && b.AwayTeam.Equals(game.awayCompetitor.name, StringComparison.OrdinalIgnoreCase));
+                        var broadcasterType = content.clientContentMetadata[0].name;
 
-                        if (content.clientContentMetadata[0].name.Equals("french", StringComparison.OrdinalIgnoreCase))
+                        if (content.clientContentMetadata[0].name.Equals("sportsnet", StringComparison.OrdinalIgnoreCase) ||
+                                content.clientContentMetadata[0].name.Equals("tnt", StringComparison.OrdinalIgnoreCase) ||
+                                content.clientContentMetadata[0].name.Equals("cbc", StringComparison.OrdinalIgnoreCase))
                         {
-                            allBroadcasters = allBroadcasters.Where(b => b.Language.Equals("fr", StringComparison.OrdinalIgnoreCase));
+                            broadcasterType = "national";
+                        }
+
+                        var allBroadcasters = broadcasts.Where(b => b.HomeTeam.Equals(game.homeCompetitor.shortName, StringComparison.OrdinalIgnoreCase)
+                                && b.AwayTeam.Equals(game.awayCompetitor.shortName, StringComparison.OrdinalIgnoreCase));
+
+                        if (broadcasterType.Equals("french", StringComparison.OrdinalIgnoreCase))
+                        {
+                            allBroadcasters = allBroadcasters.Where(b => b.Language == "fr");
                         }
                         else
-                        {
-                            allBroadcasters = allBroadcasters.Where(b => b.Language.Equals("en", StringComparison.OrdinalIgnoreCase) && 
-                                b.Type.Equals(content.clientContentMetadata[0].name, StringComparison.OrdinalIgnoreCase));
+                        {              
+                            
+                            allBroadcasters = allBroadcasters.Where(b => b.Language == "en" && 
+                                GetStreamType(b.Type).Equals(broadcasterType, StringComparison.OrdinalIgnoreCase));
                         }                         
                         
                         var broadcaster = allBroadcasters.Any() ? allBroadcasters.First() : null;
@@ -208,7 +220,7 @@ namespace NhlTvFetcher
                             Date = broadcaster != null ? broadcaster.Date : game.startTime,
                             Id = idCounter,
                             MediaId = content.id.ToString(),
-                            Type = broadcaster != null ? broadcaster.Type : content.clientContentMetadata[0].name.ToLower(),
+                            Type = broadcaster != null ? GetStreamType(broadcaster.Type): content.clientContentMetadata[0].name.ToLower(),
                             Broadcaster = broadcasterString,
                             IsFrench = content.clientContentMetadata[0].name.Equals("french", StringComparison.OrdinalIgnoreCase)
                         };
@@ -220,6 +232,26 @@ namespace NhlTvFetcher
             }
             
             return feeds;
+
+            string GetStreamType(string broadcastType)
+            {
+                if (broadcastType == "H")
+                {
+                    return "home";
+                }
+                else if (broadcastType == "A")
+                {
+                    return "away";
+                }
+                else if (broadcastType == "N")
+                {
+                    return "national";
+                }
+                else
+                {
+                    return broadcastType;
+                }
+            }
         }
 
         private List<Broadcast> GetBroadcasters(DateTime start, DateTime end)
@@ -232,8 +264,7 @@ namespace NhlTvFetcher
 
             try
             {
-                string schedulerUrl = "https://statsapi.web.nhl.com/api/v1/schedule?startDate=" + startDate + "&endDate=" + endDate
-                    + "&expand=schedule.teams,schedule.linescore,schedule.broadcasts.all";
+                string schedulerUrl = "https://api-web.nhle.com/v1/schedule/" + startDate;
                 _messenger.WriteLine($"Trying to get NHL schedule data from {schedulerUrl}", MessageCategory.Verbose);
                 Models.Json.ScheduleBroadcast.RootObject model;
 
@@ -244,28 +275,27 @@ namespace NhlTvFetcher
                     var options = new JsonSerializerOptions
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        WriteIndented = true
+                        WriteIndented = true                        
                     };
 
                     model = JsonSerializer.Deserialize<Models.Json.ScheduleBroadcast.RootObject>(json, options);
                 }
 
-                foreach (var date in model.Dates)
-                {
+                foreach (var date in model.GameWeek)
+                {                    
                     foreach (var game in date.Games)
                     {
-                        if (game.Broadcasts != null)
+                        if (game.TvBroadcasts != null)
                         {
-                            foreach (var broadcastItem in game.Broadcasts)
+                            foreach (var broadcastItem in game.TvBroadcasts)
                             {
                                 var broadcast = new Broadcast()
                                 {
-                                    HomeTeam = game.Teams.Home.Team.Name,
-                                    AwayTeam = game.Teams.Away.Team.Name,
-                                    Type = broadcastItem.Type,
-                                    Name = broadcastItem.Name,
-                                    Date = DateTime.Parse(date.Date),
-                                    Language = broadcastItem.Language
+                                    HomeTeam = game.HomeTeam.Abbrev,
+                                    AwayTeam = game.AwayTeam.Abbrev,
+                                    Type = broadcastItem.Market,
+                                    Name = broadcastItem.Network,
+                                    Date = DateTime.Parse(date.Date)
                                 };
                                 broadcasts.Add(broadcast);
                             }
