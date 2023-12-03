@@ -55,8 +55,8 @@ Authentication file (`auth.json`) must contain valid NHL.TV account email and pa
 ## Usage
 ```
 $ ./nhltv-fetcher --help
-nhltv-fetcher 1.0.1
-Copyright (C) 2022 rhdpin
+nhltv-fetcher 1.0.2
+Copyright (C) 2023 rhdpin
 
   -a, --auth-file-path    (Default: auth.json in current directory) Set full path of auth file
 
@@ -92,7 +92,7 @@ Copyright (C) 2022 rhdpin
 Choose the feed from list of found feeds and download it in `/mnt/download`
 ```
 $ ./nhltv-fetcher -c -p /mnt/download
-nhltv-fetcher 1.0.1
+nhltv-fetcher 1.0.2
 
  1: Tue 22-12-27 CHI@CAR (home, BSSO)
  2: Tue 22-12-27 CHI@CAR (away, NBCSCH)
