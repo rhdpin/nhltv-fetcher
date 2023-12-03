@@ -77,7 +77,7 @@ namespace NhlTvFetcher
                 outputMode = "--player-external-http";
             }
 
-            var streamUrl = request.StreamUrl.Replace("https://", "http://");
+            var streamUrl = request.StreamUrl;
             var streamArgs = $"\"hlsvariant://{streamUrl} name_key=bitrate \" {_options.Bitrate} --http-no-ssl-verify --http-header " +
                                 $"\"User-Agent={FeedFetcher.UserAgent}\" --hls-segment-threads=4 {loggingString} {outputMode}";
 
