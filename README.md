@@ -19,7 +19,7 @@ External media player applications (like Kodi) can be customized so that game en
 * Same geo-blocking restrictions affect use of this application as using NHL.TV in general
 
 ## Installation
-### Method 1: Build the sources
+### Method 1: Build the sources and install dependencies
 1. [Install .NET Framework SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 2. [Install Streamlink](https://github.com/streamlink/streamlink). `nhltv-fetcher` assumes that `streamlink` executable can be found from PATH. 
 3. Clone the repo: `git clone https://github.com/rhdpin/nhltv-fetcher`
@@ -55,7 +55,7 @@ Authentication file (`auth.json`) must contain valid NHL.TV account email and pa
 ## Usage
 ```
 $ ./nhltv-fetcher --help
-nhltv-fetcher 1.0.2
+nhltv-fetcher 1.0.3
 Copyright (C) 2023 rhdpin
 
   -a, --auth-file-path    (Default: auth.json in current directory) Set full path of auth file
@@ -92,7 +92,7 @@ Copyright (C) 2023 rhdpin
 Choose the feed from list of found feeds and download it in `/mnt/download`
 ```
 $ ./nhltv-fetcher -c -p /mnt/download
-nhltv-fetcher 1.0.2
+nhltv-fetcher 1.0.3
 
  1: Tue 22-12-27 CHI@CAR (home, BSSO)
  2: Tue 22-12-27 CHI@CAR (away, NBCSCH)
@@ -135,7 +135,7 @@ Writing stream to file: 364 MB (10.4 MB/s)
 Get latest game of your favorite team. It tries to get feed of chosen team (away/home) if available, otherwise it uses first feed found. It's useful also when making scheduled calls (e.g. daily) to application to automatically load latest game. 
 ```
 $ ./nhltv-fetcher -t DAL -p /mnt/download
-nhltv-fetcher 1.0.1
+nhltv-fetcher 1.0.3
 
 Fetching latest feed for 'DAL'...
 Logging in...
@@ -144,7 +144,6 @@ Feed found: Tue 22-12-27 DAL@NSH (away, BSSWX)
 Writing stream to file: 524 MB (11.6 MB/s)
 ```
 Using parameter `-l` or `--play` to open the feed directly in VLC assumes that VLC is installed and the executable can be found from PATH environment variable.
-
 ## Releases
 All release packages contain all needed files, so installation of .NET runtime is not needed. 
 
