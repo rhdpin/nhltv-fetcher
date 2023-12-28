@@ -17,7 +17,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
 RUN apk add py3-lxml
 RUN apk add py3-pycryptodome
-RUN python3 -m ensurepip
+RUN apk add py3-pip
 RUN pip3 install streamlink
 
 COPY --from=build /app/src/out ./
