@@ -182,6 +182,7 @@ namespace NhlTvFetcher
                                 !content.clientContentMetadata[0].name.Equals("sportsnet", StringComparison.OrdinalIgnoreCase) &&
                                 !content.clientContentMetadata[0].name.Equals("tnt", StringComparison.OrdinalIgnoreCase) &&
                                 !content.clientContentMetadata[0].name.Equals("cbc", StringComparison.OrdinalIgnoreCase) &&
+                                !content.clientContentMetadata[0].name.Equals("espn", StringComparison.OrdinalIgnoreCase) &&
                                 !content.clientContentMetadata[0].name.Equals("french", StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
@@ -191,6 +192,7 @@ namespace NhlTvFetcher
 
                         if (content.clientContentMetadata[0].name.Equals("sportsnet", StringComparison.OrdinalIgnoreCase) ||
                                 content.clientContentMetadata[0].name.Equals("tnt", StringComparison.OrdinalIgnoreCase) ||
+                                content.clientContentMetadata[0].name.Equals("espn", StringComparison.OrdinalIgnoreCase) ||
                                 content.clientContentMetadata[0].name.Equals("cbc", StringComparison.OrdinalIgnoreCase))
                         {
                             broadcasterType = "national";
