@@ -3,7 +3,7 @@ Helps NHL.TV subscribers to download game feeds or view them with VLC. Downloadi
 
 Main problem with official NHL.TV player user interfaces (web, mobile, TV) is that they are not good when watching games afterwards and trying to not get spoiled. NHL.TV apps allow to hide scores, but the timeline is still shown, especially when skipping intermissions and ads. It is most problematic during the playoffs, when timeline reveals if game went to OT and how long it lasted. 
 
-External media player applications (like Kodi) can be customized so that game end time is not shown.
+External media player applications (like [Kodi](https://kodi.tv/)) can be customized so that game end time is not shown.
 
 ## Features
 * Made with .NET 6.0 / C#
@@ -12,13 +12,15 @@ External media player applications (like Kodi) can be customized so that game en
 * Download game as MP4 file
 * View game stream with VLC without saving to file
 * Publish game feed as HTTP-stream for devices not capable accessing games in other means
-* Supports Windows, MacOS and Linux
 
 ## Requirements
 * Active NHL.TV subscription is needed
 * Same geo-blocking restrictions affect use of this application as using NHL.TV in general
+* Windows, MacOS or Linux operating system
 
 ## Installation
+Installation can be done using three methods: building from sources, using the released binaries or by using the Docker container.
+
 ### Method 1: Build the sources and install dependencies
 1. [Install .NET Framework SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 2. [Install Streamlink](https://github.com/streamlink/streamlink). `nhltv-fetcher` assumes that `streamlink` executable can be found from PATH. 
@@ -55,7 +57,7 @@ Authentication file (`auth.json`) must contain valid NHL.TV account email and pa
 ## Usage
 ```
 $ ./nhltv-fetcher --help
-nhltv-fetcher 1.0.3
+nhltv-fetcher 1.0.4
 Copyright (C) 2023 rhdpin
 
   -a, --auth-file-path    (Default: auth.json in current directory) Set full path of auth file
@@ -92,7 +94,7 @@ Copyright (C) 2023 rhdpin
 Choose the feed from list of found feeds and download it in `/mnt/download`
 ```
 $ ./nhltv-fetcher -c -p /mnt/download
-nhltv-fetcher 1.0.3
+nhltv-fetcher 1.0.4
 
  1: Tue 22-12-27 CHI@CAR (home, BSSO)
  2: Tue 22-12-27 CHI@CAR (away, NBCSCH)
@@ -135,7 +137,7 @@ Writing stream to file: 364 MB (10.4 MB/s)
 Get latest game of your favorite team. It tries to get feed of chosen team (away/home) if available, otherwise it uses first feed found. It's useful also when making scheduled calls (e.g. daily) to application to automatically load latest game. 
 ```
 $ ./nhltv-fetcher -t DAL -p /mnt/download
-nhltv-fetcher 1.0.3
+nhltv-fetcher 1.0.4
 
 Fetching latest feed for 'DAL'...
 Logging in...
