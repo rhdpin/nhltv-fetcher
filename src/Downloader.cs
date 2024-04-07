@@ -193,9 +193,8 @@ namespace NhlTvFetcher
 
                         if (unexpectedOutput)
                         {
-                            _messenger.WriteLine("\nLooks like something went wrong. Please check that redirection is configured either by editing " +
-                                "hosts file or by using proxy (parameter '-x' and requires that mlbamproxy is found). " +
-                                "By default application expects that hosts file is edited");
+                            _messenger.WriteLine("\nLooks like something went wrong when downloading. " + 
+                                "Please check that you can access NHL.TV from IP address you are currently using.");
                         }
                     }
                     else
