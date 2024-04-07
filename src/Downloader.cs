@@ -79,7 +79,7 @@ namespace NhlTvFetcher
 
             var streamUrl = request.StreamUrl;
             var streamArgs = $"\"hlsvariant://{streamUrl} name_key=bitrate \" {_options.Bitrate} --http-header " +
-                                $"\"User-Agent={FeedFetcher.UserAgent}\" --hls-segment-threads=4 {loggingString} {outputMode}";
+                                $"\"User-Agent={FeedFetcher.UserAgent}\" --stream-segment-threads=4 {loggingString} {outputMode}";
 
             _messenger.WriteLine($"Starting download with command '{StreamLinkAppName} {streamArgs}", MessageCategory.Verbose);
 
@@ -193,7 +193,7 @@ namespace NhlTvFetcher
                         if (unexpectedOutput)
                         {
                             _messenger.WriteLine("\nLooks like something went wrong when downloading. " + 
-                                "Please check that you can access NHL.TV from IP address you are currently using.");
+                                "Please check first that you can access NHL.TV from IP address you are currently using.");
                         }
                     }
                     else
