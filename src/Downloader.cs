@@ -177,7 +177,8 @@ namespace NhlTvFetcher
                                 if (line != null)
                                 {
                                     if (!line.StartsWith("[cli][info]") && !line.Contains("[download]") &&
-                                        !line.StartsWith(request.TargetFileName))
+                                        !line.StartsWith(request.TargetFileName) &&
+                                        !line.StartsWith("[warnings][insecurerequestwarning]"))
                                     {
                                         _messenger.WriteLine($"{line}");
                                         unexpectedOutput = true;
