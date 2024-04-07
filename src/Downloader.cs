@@ -192,8 +192,8 @@ namespace NhlTvFetcher
 
                         if (unexpectedOutput)
                         {
-                            _messenger.WriteLine("\nLooks like something went wrong when downloading. " + 
-                                "Please check first that you can access NHL.TV from IP address you are currently using.");
+                            _messenger.WriteLine("\nLooks like something happened when downloading. If the log indicates more than just warnings, " + 
+                                "please check first that you can access NHL.TV from IP address you are currently using.");
                         }
                     }
                     else
