@@ -178,7 +178,8 @@ namespace NhlTvFetcher
                                 {
                                     if (!line.StartsWith("[cli][info]") && !line.Contains("[download]") &&
                                         !line.StartsWith(request.TargetFileName) &&
-                                        !line.StartsWith("[warnings][insecurerequestwarning]"))
+                                        !line.StartsWith("[warnings][insecurerequestwarning]") &&
+                                        !line.Contains("/usr/lib/python3.10/site-packages/urllib3/connectionpool.py:1099"))
                                     {
                                         _messenger.WriteLine($"{line}");
                                         unexpectedOutput = true;
