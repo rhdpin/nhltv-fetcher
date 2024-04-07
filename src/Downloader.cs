@@ -78,7 +78,7 @@ namespace NhlTvFetcher
             }
 
             var streamUrl = request.StreamUrl;
-            var streamArgs = $"\"hlsvariant://{streamUrl} name_key=bitrate \" {_options.Bitrate} --http-no-ssl-verify --http-header " +
+            var streamArgs = $"\"hlsvariant://{streamUrl} name_key=bitrate \" {_options.Bitrate} --http-header " +
                                 $"\"User-Agent={FeedFetcher.UserAgent}\" --hls-segment-threads=4 {loggingString} {outputMode}";
 
             _messenger.WriteLine($"Starting download with command '{StreamLinkAppName} {streamArgs}", MessageCategory.Verbose);
@@ -177,9 +177,7 @@ namespace NhlTvFetcher
                                 if (line != null)
                                 {
                                     if (!line.StartsWith("[cli][info]") && !line.Contains("[download]") &&
-                                        !line.StartsWith(request.TargetFileName) &&
-                                        !line.StartsWith("[warnings][insecurerequestwarning]") &&
-                                        !line.Contains("/usr/lib/python3.10/site-packages/urllib3/connectionpool.py:1099"))
+                                        !line.StartsWith(request.TargetFileName))
                                     {
                                         _messenger.WriteLine($"{line}");
                                         unexpectedOutput = true;
