@@ -38,7 +38,13 @@ namespace NhlTvFetcher
                         {
                             Console.WriteLine($"Please check the format of given date string ('{options.Date}'). The date format should be in format yyyy-MM-dd");
                             _exitCode = -1;
-                        }                        
+                        }      
+                        
+                        if (options.Team == null && options.French)
+                        {
+                            Console.WriteLine($"French feeds can only be preferred when getting latest game for a team");
+                            _exitCode = -1;
+                        }
                     })
                     .WithNotParsed<Options>((errors) =>
                     {

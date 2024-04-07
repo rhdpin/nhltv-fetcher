@@ -70,6 +70,8 @@ Copyright (C) 2023 rhdpin
 
   -e, --date              (Default: current date) Specify date to search games from (in format yyyy-MM-dd, e.g. 2019-12-22                          
 
+  -f, --french            Prefer French feeds when getting latest game feed for the selected team (use with -t)
+  
   -h, --hide-progress     Hide download progress information
 
   -l, --play              Play the feed instead of writing to file (need to have VLC installed and defined in PATH env variable)                          

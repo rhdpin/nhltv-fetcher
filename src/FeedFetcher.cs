@@ -29,11 +29,11 @@ namespace NhlTvFetcher
             var feeds = GetFeeds(startDate, endDate);
 
             var feedsWithSelectedTeam = feeds.OrderByDescending(f => f.Date)
-                .Where(f => f.Away.Equals(teamName, StringComparison.OrdinalIgnoreCase) ||
+                .Where(f => (!f.IsFrench || _options.French) && f.Away.Equals(teamName, StringComparison.OrdinalIgnoreCase) ||
                 f.Home.Equals(teamName, StringComparison.OrdinalIgnoreCase)).ToList();
             if (feedsWithSelectedTeam.Count == 0)
             {
-                _messenger.WriteLine($"No game for '{teamName}' was found ({startDate.ToShortDateString()}-{endDate.ToShortDateString()})");
+                _messenger.WriteLine($"No game feed for '{teamName}' was found ({startDate.ToShortDateString()}-{endDate.ToShortDateString()})");
                 return null;
             }
 
@@ -41,11 +41,25 @@ namespace NhlTvFetcher
             var isHomeTeam = feedsWithSelectedTeam[0].Home.Equals(teamName, StringComparison.OrdinalIgnoreCase);
             var latestStreams = feedsWithSelectedTeam.Where(f => f.Date.Equals(latestDate));
 
-            Feed chosenFeed;
-            if (isHomeTeam)
-                chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("home", StringComparison.OrdinalIgnoreCase) && !f.IsFrench);
-            else
-                chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("away", StringComparison.OrdinalIgnoreCase) && !f.IsFrench);
+            Feed chosenFeed = null;
+
+            if (_options.French)
+            {
+                if (isHomeTeam)
+                    chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("home", StringComparison.OrdinalIgnoreCase) && f.IsFrench);
+                else
+                    chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("away", StringComparison.OrdinalIgnoreCase) && f.IsFrench);
+
+                chosenFeed ??= latestStreams.FirstOrDefault(f => f.IsFrench);
+            }
+
+            if (chosenFeed == null)
+            {
+                if (isHomeTeam)
+                    chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("home", StringComparison.OrdinalIgnoreCase) && !f.IsFrench);
+                else
+                    chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("away", StringComparison.OrdinalIgnoreCase) && !f.IsFrench);
+            }            
 
             chosenFeed ??= latestStreams.FirstOrDefault(f => !f.IsFrench);
 

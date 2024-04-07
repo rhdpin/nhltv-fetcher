@@ -18,6 +18,9 @@ namespace NhlTvFetcher
 
         [Option('e', "date", Required = false, HelpText = "(Default: current date) Specify date to search games from (in format yyyy-MM-dd, e.g. 2019-12-22")]
         public string Date { get; set; }
+        
+        [Option('f', "french", Required = false, HelpText = "Prefer French feeds when getting latest game feed for the selected team (use with -t)")]
+        public bool French { get; set; }
 
         [Option('h', "hide-progress", Required = false, HelpText = "Hide download progress information")]
         public bool HideProgress { get; set; }
