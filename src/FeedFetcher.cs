@@ -222,14 +222,37 @@ namespace NhlTvFetcher
                             allBroadcasters = allBroadcasters.Where(b => b.Language == "fr");
                         }
                         else
-                        {              
-                            
+                        {      
                             allBroadcasters = allBroadcasters.Where(b => b.Language == "en" && 
                                 GetStreamType(b.Type).Equals(broadcasterType, StringComparison.OrdinalIgnoreCase));
-                        }                         
-                        
-                        var broadcaster = allBroadcasters.Any() ? allBroadcasters.First() : null;
-                        var broadcasterString = allBroadcasters.Any() ? string.Join('/', allBroadcasters.Select(b => b.Name).ToArray()) : null;
+                        }
+
+                        Broadcast broadcaster = null;
+                        string broadcasterString = null;
+
+                        if  (allBroadcasters.Any())
+                        {
+                            broadcaster = allBroadcasters.FirstOrDefault(b => b.Name.Equals(content.clientContentMetadata[0].name,
+                                StringComparison.InvariantCultureIgnoreCase));
+
+                            if (broadcaster != null)
+                            {
+                                broadcasterString = broadcaster.Name;                                
+                            }
+                            else
+                            {
+                                broadcaster = allBroadcasters.First();
+                                if (content.clientContentMetadata[0].name.Equals("home", StringComparison.OrdinalIgnoreCase) ||
+                                    content.clientContentMetadata[0].name.Equals("away", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    broadcasterString = broadcaster.Name;
+                                }
+                                else
+                                {
+                                    broadcasterString = content.clientContentMetadata[0].name;
+                                }
+                            }                        
+                        }                        
 
                         var feed = new Feed()
                         {
