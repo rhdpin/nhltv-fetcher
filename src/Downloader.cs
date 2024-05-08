@@ -49,8 +49,8 @@ namespace NhlTvFetcher
                 streamLinkAppName += ".exe";
             }
 
-            var targetDirectory = Path.GetDirectoryName(request.TargetFileName);
-            if (request.TargetFileName != null && !targetDirectory.Equals(string.Empty) && !Directory.Exists(targetDirectory))
+            var targetDirectory = Path.GetDirectoryName(request.TargetFilePath);
+            if (request.TargetFilePath != null && !targetDirectory.Equals(string.Empty) && !Directory.Exists(targetDirectory))
             {
                 _messenger.WriteLine("Target path was not found. Do you want to create it? (y/n): ");
                 var cki = Console.ReadKey();
@@ -67,7 +67,7 @@ namespace NhlTvFetcher
                 loggingString = $"-v -l debug";
             }
 
-            string outputMode = $"-f -o {request.TargetFileName}";
+            string outputMode = $"-f -o {request.TargetFilePath}";
             if (_options.Play)
             {
                 outputMode = "";
@@ -140,9 +140,9 @@ namespace NhlTvFetcher
                                 {
                                     Thread.Sleep(500);
                                                                         
-                                    if (File.Exists(request.TargetFileName))
+                                    if (File.Exists(request.TargetFilePath))
                                     {
-                                        var currentSize = new FileInfo(request.TargetFileName).Length;
+                                        var currentSize = new FileInfo(request.TargetFilePath).Length;
                                         if (counter % 10 == 0)
                                         {
                                             var currentTime = DateTime.Now;
@@ -177,7 +177,7 @@ namespace NhlTvFetcher
                                 if (line != null)
                                 {
                                     if (!line.StartsWith("[cli][info]") && !line.Contains("[download]") &&
-                                        !line.StartsWith(request.TargetFileName))
+                                        !line.StartsWith(request.TargetFilePath))
                                     {
                                         _messenger.WriteLine($"{line}");
                                         unexpectedOutput = true;
@@ -194,11 +194,11 @@ namespace NhlTvFetcher
                         {
                             _messenger.WriteLine("\nLooks like something happened when downloading. If the log indicates more than just warnings, " + 
                                 "please check first that you can access NHL.TV from IP address you are currently using.");
-                            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(request.TargetFileName);
+                            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(request.TargetFilePath);
 
-                            if (File.Exists(request.TargetFileName))
+                            if (File.Exists(request.TargetFilePath))
                             {
-                                var suspectFilePath = request.TargetFileName.Replace(fileNameWithoutExtension, 
+                                var suspectFilePath = request.TargetFilePath.Replace(fileNameWithoutExtension, 
                                     fileNameWithoutExtension + "-suspect");
 
                                 if (File.Exists(suspectFilePath))
@@ -206,7 +206,7 @@ namespace NhlTvFetcher
                                     File.Delete(suspectFilePath);
                                 }
 
-                                File.Move(request.TargetFileName, suspectFilePath);
+                                File.Move(request.TargetFilePath, suspectFilePath);
                             }                            
                         }
                     }

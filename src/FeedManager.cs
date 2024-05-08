@@ -119,21 +119,21 @@ namespace NhlTvFetcher
 
         private void Download(string streamUrl, Feed feed, string targetPath)
         {
-            var fileName = GetTargetFileName(feed, targetPath);
+            var filePath = GetTargetFilePath(feed, targetPath);
 
-            var suspectFilePath = fileName.Replace(Path.GetFileNameWithoutExtension(fileName),
-                                    Path.GetFileNameWithoutExtension(fileName) + "-suspect");
-            if ((File.Exists(fileName) || File.Exists(suspectFilePath))  && !_options.OverwriteExistingFile && !_options.Play && !_options.Stream)
+            var suspectFilePath = filePath.Replace(Path.GetFileNameWithoutExtension(filePath),
+                                    Path.GetFileNameWithoutExtension(filePath) + "-suspect");
+            if ((File.Exists(filePath) || File.Exists(suspectFilePath))  && !_options.OverwriteExistingFile && !_options.Play && !_options.Stream)
             {
                 _messenger.WriteLine("Skipping download because file already exists.");
                 return;
             }
 
-            var downloadRequest = new DownloadRequest() { StreamUrl = streamUrl, TargetFileName = fileName };
+            var downloadRequest = new DownloadRequest() { StreamUrl = streamUrl, TargetFilePath = filePath };
             _downloader.Download(downloadRequest);            
         }
 
-        private static string GetTargetFileName(Feed feed, string directoryPath)
+        private static string GetTargetFilePath(Feed feed, string directoryPath)
         {            
             var formattedDate = feed.Date.ToString("yy-MM-dd").Replace("/", "-");
             var formattedBroadcaster = feed.Broadcaster?.Replace("/", "_");
