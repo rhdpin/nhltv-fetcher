@@ -4,12 +4,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <Authors>rhdpin</Authors>
     <Product />
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <InvariantGlobalization>true</InvariantGlobalization>
 	<NoWarn>$(NoWarn);SYSLIB0014</NoWarn>
 	<RootNamespace>NhlTvFetcher</RootNamespace>
-	<AssemblyVersion>1.0.8</AssemblyVersion>
-	<FileVersion>1.0.8.0</FileVersion>
+	<AssemblyVersion>1.0.9</AssemblyVersion>
+	<FileVersion>1.0.9.0</FileVersion>
   </PropertyGroup>  
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />

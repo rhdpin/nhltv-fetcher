@@ -57,7 +57,7 @@ Authentication file (`auth.json`) must contain valid NHL.TV account email and pa
 ## Usage
 ```
 $ ./nhltv-fetcher --help
-nhltv-fetcher 1.0.8
+nhltv-fetcher 1.0.9
 Copyright (C) 2023 rhdpin
 
   -a, --auth-file-path    (Default: auth.json in current directory) Set full path of auth file
@@ -96,7 +96,7 @@ Copyright (C) 2023 rhdpin
 Choose the feed from list of found feeds and download it in `/mnt/download`
 ```
 $ ./nhltv-fetcher -c -p /mnt/download
-nhltv-fetcher 1.0.8
+nhltv-fetcher 1.0.9
 
  1: Tue 22-12-27 CHI@CAR (home, BSSO)
  2: Tue 22-12-27 CHI@CAR (away, NBCSCH)
@@ -139,7 +139,7 @@ Writing stream to file: 364 MB (10.4 MB/s)
 Get latest game of your favorite team. It tries to get feed of chosen team (away/home) if available, otherwise it uses first feed found. It's useful also when making scheduled calls (e.g. daily) to application to automatically load latest game. 
 ```
 $ ./nhltv-fetcher -t DAL -p /mnt/download
-nhltv-fetcher 1.0.8
+nhltv-fetcher 1.0.9
 
 Fetching latest feed for 'DAL'...
 Logging in...
