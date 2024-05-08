@@ -119,9 +119,11 @@ namespace NhlTvFetcher
 
         private void Download(string streamUrl, Feed feed, string targetPath)
         {
-            var fileName = GetTargetFileName(feed, targetPath);            
+            var fileName = GetTargetFileName(feed, targetPath);
 
-            if (File.Exists(fileName) && !_options.OverwriteExistingFile && !_options.Play && !_options.Stream)
+            var suspectFilePath = fileName.Replace(Path.GetFileNameWithoutExtension(fileName),
+                                    Path.GetFileNameWithoutExtension(fileName) + "-suspect");
+            if ((File.Exists(fileName) || File.Exists(suspectFilePath))  && !_options.OverwriteExistingFile && !_options.Play && !_options.Stream)
             {
                 _messenger.WriteLine("Skipping download because file already exists.");
                 return;

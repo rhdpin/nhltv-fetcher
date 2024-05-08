@@ -194,6 +194,20 @@ namespace NhlTvFetcher
                         {
                             _messenger.WriteLine("\nLooks like something happened when downloading. If the log indicates more than just warnings, " + 
                                 "please check first that you can access NHL.TV from IP address you are currently using.");
+                            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(request.TargetFileName);
+
+                            if (File.Exists(request.TargetFileName))
+                            {
+                                var suspectFilePath = request.TargetFileName.Replace(fileNameWithoutExtension, 
+                                    fileNameWithoutExtension + "-suspect");
+
+                                if (File.Exists(suspectFilePath))
+                                {
+                                    File.Delete(suspectFilePath);
+                                }
+
+                                File.Move(request.TargetFileName, suspectFilePath);
+                            }                            
                         }
                     }
                     else
