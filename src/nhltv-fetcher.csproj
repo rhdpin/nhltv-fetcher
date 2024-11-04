@@ -4,12 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <Authors>rhdpin</Authors>
     <Product />
-    <Version>1.0.9</Version>
+    <Version>1.1.1</Version>
     <InvariantGlobalization>true</InvariantGlobalization>
 	<NoWarn>$(NoWarn);SYSLIB0014</NoWarn>
 	<RootNamespace>NhlTvFetcher</RootNamespace>
-	<AssemblyVersion>1.0.9</AssemblyVersion>
-	<FileVersion>1.0.9.0</FileVersion>
+	<AssemblyVersion>1.1.1</AssemblyVersion>
+	<FileVersion>1.1.1.0</FileVersion>
 	<Description>NHLTV Fetcher</Description>
 	<ApplicationIcon>NHLTVFetcher.ico</ApplicationIcon>
   </PropertyGroup>
