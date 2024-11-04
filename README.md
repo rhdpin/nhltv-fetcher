@@ -6,12 +6,12 @@ Main problem with official NHL.TV player user interfaces (web, mobile, TV) is th
 External media player applications (like [Kodi](https://kodi.tv/)) can be customized so that game end time is not shown.
 
 ## Features
-* Made with .NET 6.0 / C#
+* Made with .NET 8.0 / C#
 * Command-line interface
 * Choose a game or get latest game of a team
 * Download game as MP4 file
-* View game stream with VLC without saving to file
-* Publish game feed as HTTP-stream for devices not capable accessing games in other means
+* View game stream with MPV or VLC without saving to file
+* Publish game feed as HTTP-stream for devices not capable of accessing games in other means
 
 ## Requirements
 * Active NHL.TV subscription is needed
@@ -26,9 +26,9 @@ Installation can be done using three methods: building from sources, using the r
 2. [Install Streamlink](https://github.com/streamlink/streamlink). `nhltv-fetcher` assumes that `streamlink` executable can be found from PATH. 
 3. Clone the repo: `git clone https://github.com/rhdpin/nhltv-fetcher`
 4. Build (in `src/` directory): `dotnet build`
-5. Create [authentication file](#authentication-file) (`src\bin\Debug\net6.0\auth.json`)
+5. Create [authentication file](#authentication-file) (`src\bin\Debug\net8.0\auth.json`)
 
-Executable is located in `src\bin\Debug\net6.0\`.
+Executable is located in `src\bin\Debug\net8.0\`.
 
 ### Method 2: Download released binaries and install dependencies
 1. Download and extract the compiled binary files from [Releases](https://github.com/rhdpin/nhltv-fetcher/releases)
@@ -57,40 +57,70 @@ Authentication file (`auth.json`) must contain valid NHL.TV account email and pa
 ## Usage
 ```
 $ ./nhltv-fetcher --help
-nhltv-fetcher 1.0.9
-Copyright (C) 2023 rhdpin
+nhltv-fetcher 1.1.1
+Copyright (C) 2024 rhdpin
 
-  -a, --auth-file-path    (Default: auth.json in current directory) Set full path of auth file
+  -a, --auth-file-path         (Default: auth.json in current directory) Set full path of the JSON authorization file
+                               containing your NHLTV email and password.
 
-  -b, --bitrate           (Default: best) Specify bitrate of stream to be downloaded. Use verbose mode to see available bitrates.                          
+  -b, --bitrate                (Default: best) Specify the bitrate of the stream to be downloaded. Use verbose mode
+                               ('-v') to see available bitrates.
 
-  -c, --choose            Choose the feed from list of found feeds.
+  -c, --choose                 (Default: false) Choose the feed from a list of found feeds.
 
-  -d, --days              (Default: 2) Specify how many days back to search games
+  -d, --days                   (Default: 2) Specify how many days back to search for games.
 
-  -e, --date              (Default: current date) Specify date to search games from (in format yyyy-MM-dd, e.g. 2019-12-22                          
+  -e, --date                   (Default: current date) Specify date to search games from (in format yyyy-MM-dd, e.g.
+                               2019-12-22.
 
-  -f, --french            Prefer French feeds when getting latest game feed for the selected team (use with -t)
+  -f, --french                 (Default: false) Prefer french feeds when getting the latest game feed for the selected
+                               team (use with '-t').
 
-  -h, --hide-progress     Hide download progress information
+  -h, --hide-progress          (Default: false) Hide download progress information.
 
-  -l, --play              Play the feed instead of writing to file (need to have VLC installed and defined in PATH env variable)                          
+  -l, --play                   (Default: false) Play the feed instead of downloading it (need to have VLC/MPV installed
+                               and defined in PATH env variable).
 
-  -o, --overwrite         Overwrite file if it already exists (instead of skipping the download).
+  -m, --player                 (Default: mpv) If playing the feed ('-l'), you can choose your media player by using this
+                               parameter option. Built-in player parameters exist for MPV and VLC but any player can be
+                               used along with a custom set of parameters ('--player-parameters').
 
-  -p, --path              (Default: current directory) Set target download path.
+  --player-parameters          (Default: none) If playing the feed ('-l'), pass any additional parameters for use when
+                               invoking the media player.
+                                e.g. --player-parameters="--ontop-level=system --taskbar-progress=no"
 
-  -s, --stream            Create a stream of the feed to network. Connect to stream using URL shown in output.
+  -o, --overwrite              (Default: false) Overwrite file if it already exists (instead of skipping the download).
 
-  -t, --team              Get latest game for team (three letter abbreviation. E.g. WPG).
+  -p, --path                   (Default: current directory) Set target download path.
 
-  -u, --url               Get only URL (for Streamlink) of the stream but don't download.
+  -s, --stream                 (Default: false) Create a stream of the feed to network. Connect to stream using URL
+                               shown in output.
 
-  -v, --verbose           Use verbose mode to get more detailed output.
+  -t, --team                   (Default: none) Get latest game for team (three letter abbreviation. E.g. WPG).
 
-  --help                  Display this help screen.
+  -u, --url                    (Default: false) Return the URL (for Streamlink) of the stream but don't download.
 
-  --version               Display version information.
+  -v, --verbose                (Default: false) Use verbose mode to get more detailed output.
+
+  --tiled-player-parameters    If playing multiple feeds ('-y'), pass these parameters to set tiled positions for each
+                               player instance.
+                                Note: Default layouts exist for both MPV and VLC media players, but can be overridden
+                                with these values.
+                                e.g. --tiled-player-parameters="50%+0+0 50%+100%+0 50%+0+100% 50%+100%+100% 25%+50%+50%"
+
+  -x, --stream-position        (Default: ask) If playing the stream ('-l'), will start at this position:
+                                1        Start
+                                2        2nd Period (approx)
+                                3        3rd Period (approx)
+                                4        Live
+                                xx       Custom time (in minutes)
+
+  -y, --multiple-feeds         (Default: false) If playing the stream ('-l'), will continuously ask for another feed
+                               number. Used to play multiple streams without invoking the app multiple times.
+
+  --help                       Display this help screen.
+
+  --version                    Display version information.
 ```
 
 Choose the feed from list of found feeds and download it in `/mnt/download`
@@ -98,45 +128,51 @@ Choose the feed from list of found feeds and download it in `/mnt/download`
 $ ./nhltv-fetcher -c -p /mnt/download
 nhltv-fetcher 1.0.9
 
- 1: Tue 22-12-27 CHI@CAR (home, BSSO)
- 2: Tue 22-12-27 CHI@CAR (away, NBCSCH)
- 3: Tue 22-12-27 BOS@OTT (home, TSN5)
- 4: Tue 22-12-27 BOS@OTT (away, NESN)
- 5: Tue 22-12-27 BOS@OTT (home, French, RDS)
- 6: Tue 22-12-27 WSH@NYR (away, NBCSWA+)
- 7: Tue 22-12-27 PIT@NYI (home, MSGSN)
- 8: Tue 22-12-27 PIT@NYI (away, ATTSN-PT)
- 9: Tue 22-12-27 MIN@WPG (home, TSN3)
-10: Tue 22-12-27 MIN@WPG (away, BSN/BSWI)
-11: Tue 22-12-27 TOR@STL (home, BSMW)
-12: Tue 22-12-27 DAL@NSH (home, BSSO)
-13: Tue 22-12-27 DAL@NSH (away, BSSWX)
-14: Tue 22-12-27 COL@ARI (home, BSAZX)
-15: Tue 22-12-27 COL@ARI (away, ALT2)
-16: Tue 22-12-27 EDM@CGY (national, SNE/SNW)
-17: Tue 22-12-27 SJS@VAN (home, SNP)
-18: Tue 22-12-27 SJS@VAN (away, NBCSCA)
-19: Tue 22-12-27 VGK@LAK (home, BSW)
-20: Tue 22-12-27 VGK@LAK (away, ATTSN-RM)
-21: Wed 22-12-28 MTL@TBL (home, BSSUNX)
-22: Wed 22-12-28 MTL@TBL (national, SN)
-23: Wed 22-12-28 MTL@TBL (away, French, RDS)
-24: Wed 22-12-28 DET@PIT (home, ATTSN-PT)
-25: Wed 22-12-28 DET@PIT (away, BSDET)
-26: Wed 22-12-28 BOS@NJD (national, TNT)
-27: Wed 22-12-28 CGY@SEA (national, TNT)
-28: Wed 22-12-28 CGY@SEA (away, SNW)
-29: Wed 22-12-28 VGK@ANA (home, BSSC)
-30: Wed 22-12-28 VGK@ANA (away, ATTSN-RM)
+ 1: Sat 2024-11-02 12:00PM DAL@FLA (HOME) (SCRIPPS)
+ 2: Sat 2024-11-02 12:00PM DAL@FLA (AWAY) (VICTORY+)
+ 3: Sat 2024-11-02 01:00PM BOS@PHI (HOME) (NBCSP)
+ 4: Sat 2024-11-02 01:00PM BOS@PHI (AWAY) (NESN)
+ 5: Sat 2024-11-02 04:00PM CHI@LAK (AWAY) (CHSN)
+ 6: Sat 2024-11-02 04:00PM CHI@LAK (HOME) (FDSNW)
+ 7: Sat 2024-11-02 05:00PM CBJ@WSH (HOME) (MNMT)
+ 8: Sat 2024-11-02 05:00PM CBJ@WSH (AWAY) (FDSNOH)
+ 9: Sat 2024-11-02 07:00PM SEA@OTT (AWAY) (KHN)
+10: Sat 2024-11-02 07:00PM SEA@OTT (NATIONAL) (SN1)
+11: Sat 2024-11-02 07:00PM BUF@DET (HOME) (FDSNDET)
+12: Sat 2024-11-02 07:00PM BUF@DET (AWAY) (MSG-B)
+13: Sat 2024-11-02 07:00PM MTL@PIT (HOME) (SN-PIT)
+14: Sat 2024-11-02 07:00PM MTL@PIT (NATIONAL) (TVAS) (FRENCH)
+15: Sat 2024-11-02 07:00PM MTL@PIT (NATIONAL) (SNE)
+16: Sat 2024-11-02 07:00PM TOR@STL (NATIONAL) (CBC)
+17: Sat 2024-11-02 07:00PM TOR@STL (HOME) (FDSNMW)
+18: Sat 2024-11-02 08:00PM COL@NSH (AWAY) (ALT2)
+19: Sat 2024-11-02 08:00PM COL@NSH (HOME) (FDSNSO)
+20: Sat 2024-11-02 10:00PM UTA@VGK (HOME) (SCRIPPS)
+21: Sat 2024-11-02 10:00PM UTA@VGK (AWAY) (UTAH16)
+22: Sat 2024-11-02 10:00PM VAN@SJS (HOME) (NBCSCA)
+23: Sat 2024-11-02 10:00PM VAN@SJS (NATIONAL) (CBC)
 
-Choose feed (q to quit): 20
+24: Sun 2024-11-03 01:00PM NYI@NYR (HOME) (MSG)
+25: Sun 2024-11-03 01:00PM NYI@NYR (AWAY) (MSGSN)
+26: Sun 2024-11-03 03:00PM TBL@WPG (HOME) (TSN3)
+27: Sun 2024-11-03 03:00PM TBL@WPG (AWAY) (FDSNSUN)
+28: Sun 2024-11-03 05:00PM SEA@BOS (HOME) (NESN)
+29: Sun 2024-11-03 05:00PM SEA@BOS (AWAY) (KHN)
+30: Sun 2024-11-03 05:00PM WSH@CAR (AWAY) (MNMT)
+31: Sun 2024-11-03 05:00PM WSH@CAR (HOME) (FDSNSO)
+32: Sun 2024-11-03 06:00PM TOR@MIN (HOME) (FDSNNO)
+33: Sun 2024-11-03 06:00PM TOR@MIN (AWAY) (SNO)
+34: Sun 2024-11-03 08:00PM EDM@CGY (NATIONAL) (SN)
+35: Sun 2024-11-03 08:00PM CHI@ANA (HOME) (VICTORY+)
+36: Sun 2024-11-03 08:00PM CHI@ANA (AWAY) (CHSN)
+
+Choose feed number (q to quit): 23
 Logging in...
 Getting the feed...
 
-Downloading feed: Tue 22-12-27 VGK@LAK (away, ATTSN-RM)
-Writing stream to file: 364 MB (10.4 MB/s)
+Downloading feed: Sat 2024-11-02 10:00PM VAN@SJS (NATIONAL) (CBC)
 ```
-Get latest game of your favorite team. It tries to get feed of chosen team (away/home) if available, otherwise it uses first feed found. It's useful also when making scheduled calls (e.g. daily) to application to automatically load latest game. 
+Download latest game of your favorite team. It tries to get feed of chosen team (away/home) if available, otherwise it uses first feed found. It's useful also when making scheduled calls (e.g. daily) to application to automatically load latest game. 
 ```
 $ ./nhltv-fetcher -t DAL -p /mnt/download
 nhltv-fetcher 1.0.9
@@ -144,10 +180,10 @@ nhltv-fetcher 1.0.9
 Fetching latest feed for 'DAL'...
 Logging in...
 Getting the feed...
-Feed found: Tue 22-12-27 DAL@NSH (away, BSSWX)
-Writing stream to file: 524 MB (11.6 MB/s)
+Feed found: Sat 2024-11-02 10:00PM VAN@SJS (NATIONAL) (CBC)
+Downloading feed: Sat 2024-11-02 10:00PM VAN@SJS (NATIONAL) (CBC)
 ```
-Using parameter `-l` or `--play` to open the feed directly in VLC assumes that VLC is installed and the executable can be found from PATH environment variable.
+Using parameter `-l` or `--play` to open the feed directly in MPV or VLC (assuming that either player is installed and the executable can be found from PATH environment variable).
 ## Releases
 All release packages contain all needed files, so installation of .NET runtime is not needed. 
 
