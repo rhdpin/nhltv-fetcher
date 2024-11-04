@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Authors>rhdpin</Authors>
     <Product />
     <Version>1.0.9</Version>
@@ -10,10 +10,17 @@
 	<RootNamespace>NhlTvFetcher</RootNamespace>
 	<AssemblyVersion>1.0.9</AssemblyVersion>
 	<FileVersion>1.0.9.0</FileVersion>
-  </PropertyGroup>  
+	<Description>NHLTV Fetcher</Description>
+	<ApplicationIcon>NHLTVFetcher.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="NHLTVFetcher.ico" />
+  </ItemGroup>  
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="LightInject" Version="6.6.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="LightInject" Version="6.6.4" />
+  </ItemGroup>  
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 </Project>

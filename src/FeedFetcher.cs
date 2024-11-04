@@ -3,350 +3,366 @@ using NhlTvFetcher.Models;
 using NhlTvFetcher.Models.Json.Schedule;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text.Json;
 
-namespace NhlTvFetcher
-{
-    public class FeedFetcher
-    {
-        public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36";        
+namespace NhlTvFetcher {
+    public class FeedFetcher {
         private readonly Messenger _messenger;
         private readonly Options _options;
+        private readonly Session _session;
 
-        public FeedFetcher(Messenger messenger, Options options)
-        {
+        public FeedFetcher(Messenger messenger, Options options, Session session) {
             _messenger = messenger;
             _options = options;
+            _session = session;
         }
 
-        public Feed GetLatestFeedForTeam(string teamName, DateTime startDate, DateTime endDate)
-        {
-            _messenger.WriteLine($"Getting latest feed for {teamName} for game played between {startDate} and {endDate}", MessageCategory.Verbose);
-                        
+        public Feed GetLatestFeedForTeam(string teamName, DateTime startDate, DateTime endDate) {
+            _messenger.WriteLine(
+                $"Getting latest feed for {teamName} for game played between {startDate} and {endDate}",
+                LogMessageCategory.Verbose);
+
             var feeds = GetFeeds(startDate, endDate);
 
             var feedsWithSelectedTeam = feeds.OrderByDescending(f => f.Date)
-                .Where(f => (!f.IsFrench || _options.French) && f.Away.Equals(teamName, StringComparison.OrdinalIgnoreCase) ||
-                f.Home.Equals(teamName, StringComparison.OrdinalIgnoreCase)).ToList();
-            if (feedsWithSelectedTeam.Count == 0)
-            {
-                _messenger.WriteLine($"No game feed for '{teamName}' was found ({startDate.ToShortDateString()}-{endDate.ToShortDateString()})");
+                .Where(f => (!f.IsFrench || _options.French) &&
+                            f.Away.Equals(teamName) ||
+                            f.Home.Equals(teamName)).ToList();
+            if (feedsWithSelectedTeam.Count == 0) {
+                _messenger.WriteLine(
+                    $"No game feed for '{teamName}' was found ({startDate.ToShortDateString()}-{endDate.ToShortDateString()})");
                 return null;
             }
 
             var latestDate = feedsWithSelectedTeam[0].Date;
-            var isHomeTeam = feedsWithSelectedTeam[0].Home.Equals(teamName, StringComparison.OrdinalIgnoreCase);
+            var isHomeTeam = feedsWithSelectedTeam[0].Home.Equals(teamName);
             var latestStreams = feedsWithSelectedTeam.Where(f => f.Date.Equals(latestDate));
 
             Feed chosenFeed = null;
 
-            if (_options.French)
-            {
+            if (_options.French) {
                 if (isHomeTeam)
-                    chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("home", StringComparison.OrdinalIgnoreCase) && f.IsFrench);
+                    chosenFeed = latestStreams.FirstOrDefault(f =>
+                        f.Type.Equals("HOME") && f.IsFrench);
                 else
-                    chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("away", StringComparison.OrdinalIgnoreCase) && f.IsFrench);
+                    chosenFeed = latestStreams.FirstOrDefault(f =>
+                        f.Type.Equals("AWAY") && f.IsFrench);
 
                 chosenFeed ??= latestStreams.FirstOrDefault(f => f.IsFrench);
             }
 
-            if (chosenFeed == null)
-            {
+            if (chosenFeed == null) {
                 if (isHomeTeam)
-                    chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("home", StringComparison.OrdinalIgnoreCase) && !f.IsFrench);
+                    chosenFeed = latestStreams.FirstOrDefault(f =>
+                        f.Type.Equals("HOME") && !f.IsFrench);
                 else
-                    chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("away", StringComparison.OrdinalIgnoreCase) && !f.IsFrench);
-            }            
+                    chosenFeed = latestStreams.FirstOrDefault(f =>
+                        f.Type.Equals("AWAY") && !f.IsFrench);
+            }
 
             chosenFeed ??= latestStreams.FirstOrDefault(f => !f.IsFrench);
 
             return chosenFeed;
         }
 
-        public string GetStreamUrl(Feed feed)
-        {            
-            string loginCookie = "";
-            var serializationOptions = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true
-            };
+        public string GetStreamUrl(Feed feed) {
+            _session.LogIn();
 
-            _messenger.WriteLine($"Logging in...");
-            var loginUrl = $"https://nhltv.nhl.com/api/v3/sso/nhl/login";            
-            
-            string configFilePath = _options.AuthFilePath ?? Path.Combine(Directory.GetCurrentDirectory(), "auth.json");            
-            if (!File.Exists(configFilePath))
-            {
-                _messenger.WriteLine("File used to authenticate with NHL.TV not found (" + configFilePath + "). By default it is auth.json in current directory, or a custom path for auth file can be specified with '-a' parameter.\n\nExample content of auth.json:\n{ \"email\": \"myemail@somemail.com\", \"password\": \"myaccountpassword\" }");
-                return null;
-            }
+            var checkAccessUrl = Session.NhlTv.CheckAccessUri.Replace("%MEDIA_ID%", feed.MediaId);
+            _messenger.WriteLine($"Trying to get access token from {checkAccessUrl}",
+                LogMessageCategory.Verbose);
 
-            var configJson = File.ReadAllText(configFilePath);
-            using (var webClient = new WebClient())
-            {
-                webClient.Headers.Add(HttpRequestHeader.UserAgent, UserAgent);
-                webClient.Headers.Add(HttpRequestHeader.ContentType, "application/json");
-                webClient.Headers.Add(HttpRequestHeader.Accept, "application/json, text/plain, */*");
-                webClient.Headers.Add("Origin", "https://nhltv.nhl.com");
-
-                var json = webClient.UploadString(loginUrl, configJson);
-                var model = JsonSerializer.Deserialize<Models.Json.Login.Rootobject>(json, serializationOptions);
-                loginCookie = $"token={model.token}";
-            }            
-
-            var checkAccessUrl = $"https://nhltv.nhl.com/api/v3/contents/{feed.MediaId}/check-access";
-            _messenger.WriteLine($"Trying to check access from {checkAccessUrl}", MessageCategory.Verbose);
             string authCode = null;
-            using (var webClient = new WebClient())
-            {
-                webClient.Headers.Add(HttpRequestHeader.UserAgent, UserAgent);
-                webClient.Headers.Add(HttpRequestHeader.ContentType, "application/json;charset=UTF-8");
-                webClient.Headers.Add(HttpRequestHeader.Cookie, loginCookie);
+            using (var webClient = new WebClient()) {
+                webClient.Headers.Add(HttpRequestHeader.UserAgent, Session.NhlTv.UserAgent);
+                webClient.Headers.Add(HttpRequestHeader.ContentType,
+                    "application/json;charset=UTF-8");
+                webClient.Headers.Add(HttpRequestHeader.Cookie, _session.SessionToken);
 
-                webClient.Headers.Add("Origin", "https://nhltv.nhl.com");
+                webClient.Headers.Add("Origin", Session.NhlTv.OriginUri);
 
-                var json = webClient.UploadString(checkAccessUrl, "{\"type\":\"nhl\"}");                
-                var model = JsonSerializer.Deserialize<Models.Json.CheckAccess.Rootobject>(json, serializationOptions);
+                var json = webClient.UploadString(checkAccessUrl, "{\"type\":\"nhl\"}");
+                var model = json.Deserialize<Models.Json.CheckAccess.Rootobject>();
+                model = json.Deserialize<Models.Json.CheckAccess.Rootobject>();
                 authCode = model.data;
             }
 
-            var playerSettingsUrl = $"https://nhltv.nhl.com/api/v3/contents/{feed.MediaId}/player-settings";
-            _messenger.WriteLine($"Trying to get player settings from {playerSettingsUrl}", MessageCategory.Verbose);
+            var playerSettingsUrl =
+                Session.NhlTv.PlayerSettingsUri.Replace("%MEDIA_ID%", feed.MediaId);
+            _messenger.WriteLine($"Trying to get player settings from {playerSettingsUrl}",
+                LogMessageCategory.Verbose);
+
             string accessUrl = null;
-            using (var webClient = new WebClient())
-            {
-                webClient.Headers.Add(HttpRequestHeader.UserAgent, UserAgent);
-                webClient.Headers.Add(HttpRequestHeader.Cookie, loginCookie);
+            using (var webClient = new WebClient()) {
+                webClient.Headers.Add(HttpRequestHeader.UserAgent, Session.NhlTv.UserAgent);
+                webClient.Headers.Add(HttpRequestHeader.Cookie, _session.SessionToken);
 
-                webClient.Headers.Add("Origin", "https://nhltv.nhl.com");
+                webClient.Headers.Add("Origin", Session.NhlTv.OriginUri);
 
-                var json = webClient.DownloadString(playerSettingsUrl);                
-                var model = JsonSerializer.Deserialize<Models.Json.Player.Rootobject>(json, serializationOptions);
-                accessUrl = !model.streamAccess.Contains('?') ? $"{model.streamAccess}?authorization_code={authCode}" :
-                    $"{model.streamAccess}&authorization_code={authCode}";
+                var json = webClient.DownloadString(playerSettingsUrl);
+                var model = json.Deserialize<Models.Json.Player.Rootobject>();
+                accessUrl = !model.streamAccess.Contains('?')
+                    ? $"{model.streamAccess}?authorization_code={authCode}"
+                    : $"{model.streamAccess}&authorization_code={authCode}";
             }
 
             _messenger.WriteLine($"Getting the feed...");
-            string streamUrl = null;
-            _messenger.WriteLine($"Trying to get stream URL from {accessUrl}", MessageCategory.Verbose);
-            using (var webClient = new WebClient())
-            {
-                webClient.Headers.Add(HttpRequestHeader.UserAgent, UserAgent);
-                webClient.Headers.Add(HttpRequestHeader.ContentType, "application/json;charset=UTF-8");
-                webClient.Headers.Add("Origin", "https://nhltv.nhl.com");
+            _messenger.WriteLine($"Trying to get stream URL from {accessUrl}",
+                LogMessageCategory.Verbose);
 
-                var json = webClient.UploadString(accessUrl, "");                
-                var model = JsonSerializer.Deserialize<Models.Json.StreamUrl.Rootobject>(json, serializationOptions);
+            string streamUrl = null;
+            using (var webClient = new WebClient()) {
+                webClient.Headers.Add(HttpRequestHeader.UserAgent, Session.NhlTv.UserAgent);
+                webClient.Headers.Add(HttpRequestHeader.ContentType,
+                    "application/json;charset=UTF-8");
+                webClient.Headers.Add("Origin", Session.NhlTv.OriginUri);
+
+                var json = webClient.UploadString(accessUrl, "");
+                var model = json.Deserialize<Models.Json.StreamUrl.Rootobject>();
                 streamUrl = model.data.stream;
-            }            
+            }
 
             return streamUrl;
         }
 
+        /// <summary>
+        /// Retrieves the NHL schedule between the given start and end dates, respectively.
+        /// NOTE: The NHL Schedule API returns in pages of 20. So if more than 20 games are
+        /// spanned across, more calls are necessary to grab all data.
+        /// </summary>
+        /// <param name="startDate">The first day & time to get the schedule</param>
+        /// <param name="endDate">The last day & time to get the schedule</param>
+        /// <returns>An object containing the NHL schedule.</returns>
+        private Rootobject GetSchedule(DateTime startDate, DateTime endDate) {
+            string startDateString, endDateString;
+            DateTime curDate = startDate;
+            Rootobject fullModel = new Rootobject();
 
-        private Rootobject GetSchedule(DateTime start, DateTime end)
-        {
-            string startDate, endDate;
+            startDateString = startDate.ToString("yyyy-MM-dd");
+            endDateString = endDate.ToString("yyyy-MM-dd");
 
-            startDate = start.ToString("yyyy-MM-dd");
-            endDate = end.ToString("yyyy-MM-dd");
+            string schedulerUrl =
+                Session.NhlTv.SchedulerUri.Replace("%START_DATE%", startDateString)
+                    .Replace("%END_DATE%", endDateString);
+            _messenger.WriteLine($"Trying to get NHL schedule data from {schedulerUrl}",
+                LogMessageCategory.Verbose);
 
-            string schedulerUrl = "https://nhltv.nhl.com/api/v2/events?date_time_from=" + startDate + "T00:00:00-04:00&date_time_to=" + endDate
-                    + "T00:00:00-04:00&sort_direction=asc";
-            _messenger.WriteLine($"Trying to get NHL schedule data from {schedulerUrl}", MessageCategory.Verbose);
             Rootobject model;
-
-            using (var webClient = new WebClient())
-            {
-                webClient.Headers.Add("User-Agent", UserAgent);
+            using (var webClient = new WebClient()) {
+                webClient.Headers.Add("User-Agent", Session.NhlTv.UserAgent);
                 var json = webClient.DownloadString(schedulerUrl);
+                fullModel = json.Deserialize<Rootobject>();
 
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    WriteIndented = true
-                };
+                while (fullModel.meta.current_page < fullModel.meta.last_page) {
+                    json = webClient.DownloadString(schedulerUrl +
+                                                    $"&page={fullModel.meta.current_page + 1}");
+                    model = json.Deserialize<Rootobject>();
 
-                model = JsonSerializer.Deserialize<Rootobject>(json, options);
+                    fullModel.data = [..fullModel.data, ..model.data];
+                    fullModel.meta = model.meta;
+                }
             }
-            return model;
+
+            return fullModel;
         }
 
-        public IEnumerable<Feed> GetFeeds(DateTime start, DateTime end)
-        {
+        public IEnumerable<Feed> GetFeeds(DateTime start, DateTime end) {
             var schedule = GetSchedule(start, end);
             var broadcasts = GetBroadcasters(start, end);
             var feeds = new List<Feed>();
             int idCounter = 1;
 
-            foreach (var game in schedule.data)
-            {
-                foreach (var content in game.content)
-                {
-                    if (content.status.id == 4)
-                    {
-                        if (content.clientContentMetadata.Length == 0 || 
-                                !content.clientContentMetadata[0].name.Equals("home", StringComparison.OrdinalIgnoreCase) &&
-                                !content.clientContentMetadata[0].name.Equals("away", StringComparison.OrdinalIgnoreCase) &&
-                                !content.clientContentMetadata[0].name.Equals("national", StringComparison.OrdinalIgnoreCase) &&
-                                !content.clientContentMetadata[0].name.Equals("sportsnet", StringComparison.OrdinalIgnoreCase) &&
-                                !content.clientContentMetadata[0].name.Equals("tnt", StringComparison.OrdinalIgnoreCase) &&
-                                !content.clientContentMetadata[0].name.Equals("cbc", StringComparison.OrdinalIgnoreCase) &&
-                                !content.clientContentMetadata[0].name.Equals("espn", StringComparison.OrdinalIgnoreCase) &&
-                                !content.clientContentMetadata[0].name.Equals("abc", StringComparison.OrdinalIgnoreCase) &&
-                                !content.clientContentMetadata[0].name.Equals("french", StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
+            foreach (var game in schedule.data) {
+                int day = game.startTime.Day;
+                foreach (var content in game.content) {
+                    if (content.clientContentMetadata.Length != 0) {
+                        switch (content.status.id) {
+                            case 3: // replay
+                            case 4: // live
+                                var nationalBroadcaster = "";
+                                var isNational = false;
+                                var isFrench = false;
 
-                        var broadcasterType = content.clientContentMetadata[0].name;
+                                var broadcasterType = content.clientContentMetadata[0].name =
+                                    content.clientContentMetadata[0].name.ToUpper();
 
-                        if (content.clientContentMetadata[0].name.Equals("sportsnet", StringComparison.OrdinalIgnoreCase) ||
-                                content.clientContentMetadata[0].name.Equals("tnt", StringComparison.OrdinalIgnoreCase) ||
-                                content.clientContentMetadata[0].name.Equals("espn", StringComparison.OrdinalIgnoreCase) ||
-                                content.clientContentMetadata[0].name.Equals("abc", StringComparison.OrdinalIgnoreCase) ||
-                                content.clientContentMetadata[0].name.Equals("cbc", StringComparison.OrdinalIgnoreCase))
-                        {
-                            broadcasterType = "national";
-                        }
-
-                        var allBroadcasters = broadcasts.Where(b => b.HomeTeam.Equals(game.homeCompetitor.shortName, StringComparison.OrdinalIgnoreCase)
-                                && b.AwayTeam.Equals(game.awayCompetitor.shortName, StringComparison.OrdinalIgnoreCase));
-
-                        if (broadcasterType.Equals("french", StringComparison.OrdinalIgnoreCase))
-                        {
-                            allBroadcasters = allBroadcasters.Where(b => b.Language == "fr");
-                        }
-                        else
-                        {      
-                            allBroadcasters = allBroadcasters.Where(b => b.Language == "en" && 
-                                GetStreamType(b.Type).Equals(broadcasterType, StringComparison.OrdinalIgnoreCase));
-                        }
-
-                        Broadcast broadcaster = null;
-                        string broadcasterString = null;
-
-                        if  (allBroadcasters.Any())
-                        {
-                            broadcaster = allBroadcasters.FirstOrDefault(b => b.Name.Equals(content.clientContentMetadata[0].name,
-                                StringComparison.InvariantCultureIgnoreCase));
-
-                            if (broadcaster != null)
-                            {
-                                broadcasterString = broadcaster.Name;                                
-                            }
-                            else
-                            {
-                                broadcaster = allBroadcasters.First();
-                                if (content.clientContentMetadata[0].name.Equals("home", StringComparison.OrdinalIgnoreCase) ||
-                                    content.clientContentMetadata[0].name.Equals("away", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    broadcasterString = broadcaster.Name;
+                                // determine if Home/Away/National/French
+                                if (!broadcasterType.Equals("HOME")
+                                    && !broadcasterType.Equals("AWAY")) {
+                                    if (broadcasterType.Equals("FRENCH")) {
+                                        isFrench = true;
+                                    }
+                                    else {
+                                        isNational = true;
+                                    }
                                 }
-                                else
-                                {
-                                    broadcasterString = content.clientContentMetadata[0].name;
+
+                                // get all broadcasters for the given game
+                                var allBroadcasters = broadcasts.Where(b =>
+                                    b.HomeTeam.Equals(game.homeCompetitor.shortName)
+                                    && b.AwayTeam.Equals(game.awayCompetitor.shortName));
+
+                                // trim to only EN or FR feeds
+                                if (isFrench) {
+                                    allBroadcasters =
+                                        allBroadcasters.Where(b => b.Language == "fr");
                                 }
-                            }                        
-                        }                        
+                                else {
+                                    allBroadcasters = allBroadcasters.Where(b =>
+                                        b.Language == "en"
+                                        && GetStreamType(b.Type)
+                                            .Equals(isNational ? "NATIONAL" : broadcasterType));
+                                }
 
-                        var feed = new Feed()
-                        {
-                            Home = game.homeCompetitor.shortName,
-                            Away = game.awayCompetitor.shortName,                            
-                            Date = broadcaster != null ? broadcaster.Date : game.startTime,
-                            Id = idCounter,
-                            MediaId = content.id.ToString(),
-                            Type = broadcaster != null ? GetStreamType(broadcaster.Type): content.clientContentMetadata[0].name.ToLower(),
-                            Broadcaster = broadcasterString,
-                            IsFrench = content.clientContentMetadata[0].name.Equals("french", StringComparison.OrdinalIgnoreCase)
-                        };
+                                Broadcast broadcaster = null;
+                                string broadcasterString = null;
 
-                        feeds.Add(feed);
-                        idCounter++;
+                                if (allBroadcasters.Any()) {
+                                    if (allBroadcasters.Count() == 1) {
+                                        broadcaster = allBroadcasters.First();
+                                    }
+                                    else {
+                                        broadcaster = allBroadcasters.FirstOrDefault(b =>
+                                                          b.Name.Equals(broadcasterType)) ??
+                                                      allBroadcasters.FirstOrDefault(b =>
+                                                          broadcasterType.Contains(b.Name));
+                                    }
+
+                                    //broadcasterType.Contains(b.Name)
+                                    if (broadcaster != null) {
+                                        broadcasterString = broadcaster.Name;
+                                    }
+                                    else {
+                                        broadcaster = broadcasterType.Equals("SPORTSNET")
+                                            ? allBroadcasters.FirstOrDefault(b =>
+                                                b.Name.Contains("SN"))
+                                            : allBroadcasters.First();
+
+                                        if (isNational || isFrench) {
+                                            broadcasterString = broadcaster.Name;
+                                        }
+                                        else {
+                                            broadcasterString = (broadcaster.Name == "NHLN")
+                                                ? broadcasterType
+                                                : broadcaster.Name;
+                                        }
+
+                                        //if (broadcasterType.Equals("HOME") ||
+                                        //    broadcasterType.Equals("AWAY")) {
+                                        //    broadcasterString = broadcaster.Name;
+                                        //}
+                                        //else {
+                                        //    broadcasterString = (broadcaster.Name == "NHLN")
+                                        //        ? broadcasterType
+                                        //        : broadcaster.Name;
+                                        //}
+                                    }
+                                }
+
+                                var feed = new Feed() {
+                                    Home = game.homeCompetitor.shortName,
+                                    Away = game.awayCompetitor.shortName,
+                                    Date = game.startTime != DateTime.MinValue
+                                        ? game.startTime
+                                        : broadcaster.Date,
+                                    Id = idCounter,
+                                    MediaId = content.id.ToString(),
+                                    Type = broadcaster != null
+                                        ? GetStreamType(broadcaster.Type)
+                                        : broadcasterType,
+                                    Broadcaster = broadcasterString,
+                                    IsFrench = isFrench,
+                                    IsReplay = (content.status.id == 4)
+                                };
+
+                                feeds.Add(feed);
+                                idCounter++;
+
+                                break;
+
+                            case 2: // future
+                            default:
+                                break;
+                        }
                     }
                 }
             }
-            
-            return feeds;
 
-            string GetStreamType(string broadcastType)
-            {
-                if (broadcastType == "H")
-                {
-                    return "home";
-                }
-                else if (broadcastType == "A")
-                {
-                    return "away";
-                }
-                else if (broadcastType == "N")
-                {
-                    return "national";
-                }
-                else
-                {
-                    return broadcastType;
-                }
-            }
+            return feeds;
         }
 
-        private List<Broadcast> GetBroadcasters(DateTime start, DateTime end)
-        {
-            string startDate, endDate;
+        private string GetStreamType(string broadcastType) {
+            if (broadcastType == "H") {
+                return "HOME";
+            }
+
+            if (broadcastType == "A") {
+                return "AWAY";
+            }
+
+            if (broadcastType == "N") {
+                return "NATIONAL";
+            }
+
+            return broadcastType;
+        }
+
+        /// <summary>
+        /// Retrieves the NHL broadcasting networks for games between the given start
+        /// and end dates, respectively. NOTE: The NHL API returns in weeks, not days.
+        /// So if multiple weeks are spanned across, another call is necessary to grab
+        /// each successive week.
+        /// </summary>
+        /// <param name="startDate">The first day & time to get the schedule</param>
+        /// <param name="endDate">The last day & time to get the schedule</param>
+        /// <returns>An object containing the NHL schedule.</returns>
+        private List<Broadcast> GetBroadcasters(DateTime startDate, DateTime endDate) {
+            string startDateString;
+            DateTime curDate = DateTime.MinValue;
             var broadcasts = new List<Broadcast>();
 
-            startDate = start.ToString("yyyy-MM-dd");
-            endDate = end.ToString("yyyy-MM-dd");
-
-            try
-            {
-                string schedulerUrl = "https://api-web.nhle.com/v1/schedule/" + startDate;
-                _messenger.WriteLine($"Trying to get NHL schedule data from {schedulerUrl}", MessageCategory.Verbose);
+            try {
                 Models.Json.ScheduleBroadcast.RootObject model;
 
-                using (var webClient = new System.Net.WebClient())
-                {
-                    var json = webClient.DownloadString(schedulerUrl);
+                do {
+                    startDateString = startDate.ToString("yyyy-MM-dd");
+                    string schedulerUrl = "https://api-web.nhle.com/v1/schedule/" + startDateString;
+                    _messenger.WriteLine($"Trying to get NHL schedule data from {schedulerUrl}",
+                        LogMessageCategory.Verbose);
 
-                    var options = new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        WriteIndented = true                        
-                    };
+                    using (var webClient = new System.Net.WebClient()) {
+                        var json = webClient.DownloadString(schedulerUrl);
+                        model = json.Deserialize<Models.Json.ScheduleBroadcast.RootObject>();
+                    }
 
-                    model = JsonSerializer.Deserialize<Models.Json.ScheduleBroadcast.RootObject>(json, options);
-                }
+                    foreach (var date in model.GameWeek) {
+                        curDate = DateTime.Parse(date.Date);
 
-                foreach (var date in model.GameWeek)
-                {                    
-                    foreach (var game in date.Games)
-                    {
-                        if (game.TvBroadcasts != null)
-                        {
-                            foreach (var broadcastItem in game.TvBroadcasts)
-                            {
-                                var broadcast = new Broadcast()
-                                {
-                                    HomeTeam = game.HomeTeam.Abbrev,
-                                    AwayTeam = game.AwayTeam.Abbrev,
-                                    Type = broadcastItem.Market,
-                                    Name = broadcastItem.Network,
-                                    Date = DateTime.Parse(date.Date)
-                                };
-                                broadcasts.Add(broadcast);
+                        if (DateTime.Compare(curDate, endDate.Date) < 0) {
+                            foreach (var game in date.Games) {
+                                if (game.TvBroadcasts != null) {
+                                    foreach (var broadcastItem in game.TvBroadcasts) {
+                                        var broadcast = new Broadcast() {
+                                            HomeTeam = game.HomeTeam.Abbrev.ToUpper(),
+                                            AwayTeam = game.AwayTeam.Abbrev.ToUpper(),
+                                            Type = broadcastItem.Market.ToUpper(),
+                                            Name = broadcastItem.Network.ToUpper(),
+                                            Date = curDate
+                                        };
+                                        broadcasts.Add(broadcast);
+                                    }
+                                }
                             }
                         }
                     }
-                }
+
+                    startDateString = curDate.Date.AddDays(1).ToString("yyyy-MM-dd");
+                } while (DateTime.Compare(curDate, endDate) < 0);
             }
-            catch (Exception ex)
-            {
-                _messenger.WriteLine($"Getting broadcasts failed: {ex.Message}", MessageCategory.Verbose);
+            catch (Exception ex) {
+                _messenger.WriteLine($"Getting broadcasts failed: {ex.Message}",
+                    LogMessageCategory.Verbose);
             }
 
             return broadcasts;

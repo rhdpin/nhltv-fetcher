@@ -4,10 +4,8 @@
 /// Auto-generated classes to represent player settings related JSON response
 ///
 
-namespace NhlTvFetcher.Models.Json.Player
-{
-    public class Rootobject
-    {
+namespace NhlTvFetcher.Models.Json.Player {
+    public class Rootobject {
         public int videoid { get; set; }
         public int partnerid { get; set; }
         public object v5ident { get; set; }
@@ -73,30 +71,25 @@ namespace NhlTvFetcher.Models.Json.Player
         public string description { get; set; }
     }
 
-    public class Streamurlproviderinfo
-    {
+    public class Streamurlproviderinfo {
         public string providerClass { get; set; }
         public Data data { get; set; }
     }
 
-    public class Data
-    {
+    public class Data {
         public string streamAccessUrl { get; set; }
     }
 
-    public class Trackprogress
-    {
+    public class Trackprogress {
         public bool enabled { get; set; }
     }
 
-    public class Casting
-    {
+    public class Casting {
         public Chromecast chromecast { get; set; }
         public bool airplay { get; set; }
     }
 
-    public class Chromecast
-    {
+    public class Chromecast {
         public bool enabled { get; set; }
         public bool forceMediaUrl { get; set; }
         public string receiverId { get; set; }
@@ -105,15 +98,13 @@ namespace NhlTvFetcher.Models.Json.Player
         public bool useCallback { get; set; }
     }
 
-    public class Metainformation
-    {
+    public class Metainformation {
         public string sports { get; set; }
         public object liga { get; set; }
         public string competition { get; set; }
     }
 
-    public class Advertisement
-    {
+    public class Advertisement {
         public bool enabled { get; set; }
         public string client { get; set; }
         public bool skipEnabled { get; set; }
@@ -125,47 +116,40 @@ namespace NhlTvFetcher.Models.Json.Player
         public bool useNativeControls { get; set; }
     }
 
-    public class Preroll
-    {
+    public class Preroll {
         public string id { get; set; }
         public string url { get; set; }
     }
 
-    public class Postroll
-    {
+    public class Postroll {
         public string id { get; set; }
         public string url { get; set; }
     }
 
-    public class Quality
-    {
+    public class Quality {
         public bool enabled { get; set; }
         public int startIndex { get; set; }
         public Label[] labels { get; set; }
     }
 
-    public class Label
-    {
+    public class Label {
         public string label { get; set; }
         public int bitrate { get; set; }
         public string resolution { get; set; }
     }
 
-    public class Share
-    {
+    public class Share {
         public bool enabled { get; set; }
         public string url { get; set; }
         public string[] pages { get; set; }
     }
 
-    public class Skin
-    {
+    public class Skin {
         public int theme { get; set; }
         public Colors colors { get; set; }
     }
 
-    public class Colors
-    {
+    public class Colors {
         public string background { get; set; }
         public string iconbuttonprimary { get; set; }
         public string iconbuttonhover { get; set; }
@@ -180,8 +164,7 @@ namespace NhlTvFetcher.Models.Json.Player
         public string sliderbackground { get; set; }
     }
 
-    public class Customusermessages
-    {
+    public class Customusermessages {
         public string adCountdownText { get; set; }
         public string back { get; set; }
         public string cancel { get; set; }
@@ -256,30 +239,26 @@ namespace NhlTvFetcher.Models.Json.Player
         public string volumemute { get; set; }
     }
 
-    public class Watermark
-    {
+    public class Watermark {
         public bool enabled { get; set; }
         public string url { get; set; }
         public string position { get; set; }
     }
 
-    public class Heroverlay
-    {
+    public class Heroverlay {
         public bool enabled { get; set; }
         public object statId { get; set; }
         public int delay { get; set; }
     }
 
-    public class Timeline
-    {
+    public class Timeline {
         public string url { get; set; }
         public bool skipSpoilerAlert { get; set; }
         public bool ignoreTimelineText { get; set; }
         public int interval { get; set; }
     }
 
-    public class Endscreen
-    {
+    public class Endscreen {
         public bool enabled { get; set; }
         public bool countdown { get; set; }
         public int countdownTime { get; set; }
@@ -287,8 +266,7 @@ namespace NhlTvFetcher.Models.Json.Player
         public Related[] related { get; set; }
     }
 
-    public class Related
-    {
+    public class Related {
         public int id { get; set; }
         public string title { get; set; }
         public DateTime startDate { get; set; }
@@ -296,15 +274,13 @@ namespace NhlTvFetcher.Models.Json.Player
         public string target { get; set; }
     }
 
-    public class Multiplelanguage
-    {
+    public class Multiplelanguage {
         public int id { get; set; }
         public string label { get; set; }
         public bool active { get; set; }
     }
 
-    public class Analytic
-    {
+    public class Analytic {
         public string handler { get; set; }
         public string url { get; set; }
         public string key { get; set; }

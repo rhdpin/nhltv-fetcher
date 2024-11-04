@@ -4,25 +4,21 @@
 /// Auto-generated classes to represent JSON schedule data
 ///
 
-namespace NhlTvFetcher.Models.Json.Schedule
-{
-    public class Rootobject
-    {
+namespace NhlTvFetcher.Models.Json.Schedule {
+    public class Rootobject {
         public Datum[] data { get; set; }
         public Links links { get; set; }
         public Meta meta { get; set; }
     }
 
-    public class Links
-    {
+    public class Links {
         public string first { get; set; }
         public string last { get; set; }
         public object prev { get; set; }
-        public object next { get; set; }
+        public string next { get; set; }
     }
 
-    public class Meta
-    {
+    public class Meta {
         public int current_page { get; set; }
         public int? from { get; set; }
         public int last_page { get; set; }
@@ -33,15 +29,13 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public int total { get; set; }
     }
 
-    public class Link
-    {
+    public class Link {
         public string url { get; set; }
         public string label { get; set; }
         public bool active { get; set; }
     }
 
-    public class Datum
-    {
+    public class Datum {
         public int id { get; set; }
         public DateTime startTime { get; set; }
         public object endTime { get; set; }
@@ -56,32 +50,28 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public Content[] content { get; set; }
     }
 
-    public class Category1
-    {
+    public class Category1 {
         public int id { get; set; }
         public string name { get; set; }
         public object logo { get; set; }
         public object[] images { get; set; }
     }
 
-    public class Category2
-    {
+    public class Category2 {
         public int id { get; set; }
         public string name { get; set; }
         public object logo { get; set; }
         public object[] images { get; set; }
     }
 
-    public class Category3
-    {
+    public class Category3 {
         public int id { get; set; }
         public string name { get; set; }
         public object logo { get; set; }
         public object[] images { get; set; }
     }
 
-    public class Homecompetitor
-    {
+    public class Homecompetitor {
         public int id { get; set; }
         public string name { get; set; }
         public string shortName { get; set; }
@@ -93,15 +83,13 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public Colors colors { get; set; }
     }
 
-    public class Colors
-    {
+    public class Colors {
         public string textColor { get; set; }
         public string primaryColor { get; set; }
         public string secondaryColor { get; set; }
     }
 
-    public class Awaycompetitor
-    {
+    public class Awaycompetitor {
         public int id { get; set; }
         public string name { get; set; }
         public string shortName { get; set; }
@@ -113,15 +101,13 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public Colors1 colors { get; set; }
     }
 
-    public class Colors1
-    {
+    public class Colors1 {
         public string textColor { get; set; }
         public string primaryColor { get; set; }
         public string secondaryColor { get; set; }
     }
 
-    public class Clientmetadata
-    {
+    public class Clientmetadata {
         public int id { get; set; }
         public string name { get; set; }
         public object description { get; set; }
@@ -130,14 +116,12 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public Type type { get; set; }
     }
 
-    public class Type
-    {
+    public class Type {
         public int id { get; set; }
         public string name { get; set; }
     }
 
-    public class Content
-    {
+    public class Content {
         public int id { get; set; }
         public string teaserType { get; set; }
         public string externalMatchId { get; set; }
@@ -168,40 +152,34 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public Clientcontentmetadata[] clientContentMetadata { get; set; }
     }
 
-    public class Editorial
-    {
+    public class Editorial {
         public Image image { get; set; }
         public Image1[] images { get; set; }
         public object[] additionalImages { get; set; }
         public Translations translations { get; set; }
     }
 
-    public class Image
-    {
+    public class Image {
         public string path { get; set; }
         public string[] manipulations { get; set; }
     }
 
-    public class Translations
-    {
+    public class Translations {
         public En en { get; set; }
     }
 
-    public class En
-    {
+    public class En {
         public string title { get; set; }
         public string description { get; set; }
     }
 
-    public class Image1
-    {
+    public class Image1 {
         public string path { get; set; }
         public string[] manipulations { get; set; }
     }
 
-    public class Status
-    {
-        public int id { get; set; }
+    public class Status {
+        public int id { get; set; } // 3==Live, 4==Replay
         public string name { get; set; }
         public bool isLive { get; set; }
         public bool isDelivered { get; set; }
@@ -211,15 +189,13 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public object vodPremiere_startTime { get; set; }
     }
 
-    public class Payment
-    {
+    public class Payment {
         public int id { get; set; }
         public string name { get; set; }
         public Entitlement[] entitlements { get; set; }
     }
 
-    public class Entitlement
-    {
+    public class Entitlement {
         public string entitlement { get; set; }
         public string price { get; set; }
         public string type { get; set; }
@@ -227,38 +203,32 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public object tag { get; set; }
     }
 
-    public class Distributiontype
-    {
+    public class Distributiontype {
         public int id { get; set; }
         public string name { get; set; }
     }
 
-    public class Contenttype
-    {
+    public class Contenttype {
         public int id { get; set; }
         public string name { get; set; }
     }
 
-    public class Georestriction
-    {
+    public class Georestriction {
         public string isolist { get; set; }
         public Devicecategory deviceCategory { get; set; }
     }
 
-    public class Devicecategory
-    {
+    public class Devicecategory {
         public int id { get; set; }
         public string name { get; set; }
     }
 
-    public class Devicecategory1
-    {
+    public class Devicecategory1 {
         public int id { get; set; }
         public string name { get; set; }
     }
 
-    public class Clientcontentmetadata
-    {
+    public class Clientcontentmetadata {
         public int id { get; set; }
         public string name { get; set; }
         public object description { get; set; }
@@ -267,8 +237,7 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public Type1 type { get; set; }
     }
 
-    public class Type1
-    {
+    public class Type1 {
         public int id { get; set; }
         public string name { get; set; }
     }

@@ -2,17 +2,14 @@
 /// Auto-generated classes to represent login JSON response
 ///
 
-namespace NhlTvFetcher.Models.Json.Login
-{
-    public class Rootobject
-    {
+namespace NhlTvFetcher.Models.Json.Login {
+    public class Rootobject {
         public Cleengprofile cleengProfile { get; set; }
         public Nhlprofile nhlProfile { get; set; }
         public string token { get; set; }
     }
 
-    public class Cleengprofile
-    {
+    public class Cleengprofile {
         public int id { get; set; }
         public string externalId { get; set; }
         public Subscription[] subscriptions { get; set; }
@@ -20,8 +17,7 @@ namespace NhlTvFetcher.Models.Json.Login
         public Transaction[] transactions { get; set; }
     }
 
-    public class Subscription
-    {
+    public class Subscription {
         public int subscriptionId { get; set; }
         public string offerId { get; set; }
         public string status { get; set; }
@@ -39,8 +35,7 @@ namespace NhlTvFetcher.Models.Json.Login
         public bool inTrial { get; set; }
     }
 
-    public class Offer
-    {
+    public class Offer {
         public string offerId { get; set; }
         public string status { get; set; }
         public int subscriptionId { get; set; }
@@ -60,8 +55,7 @@ namespace NhlTvFetcher.Models.Json.Login
         public object pendingSwitchId { get; set; }
     }
 
-    public class Transaction
-    {
+    public class Transaction {
         public string transactionId { get; set; }
         public int transactionDate { get; set; }
         public string offerId { get; set; }
@@ -99,8 +93,7 @@ namespace NhlTvFetcher.Models.Json.Login
         public string taxRate { get; set; }
     }
 
-    public class Nhlprofile
-    {
+    public class Nhlprofile {
         public object address1 { get; set; }
         public object address2 { get; set; }
         public object city { get; set; }
@@ -120,15 +113,13 @@ namespace NhlTvFetcher.Models.Json.Login
         public object photoUrl { get; set; }
     }
 
-    public class Favoriteteam
-    {
+    public class Favoriteteam {
         public bool favorite { get; set; }
         public int sequence { get; set; }
         public Team team { get; set; }
     }
 
-    public class Team
-    {
+    public class Team {
         public int id { get; set; }
         public string commonName { get; set; }
         public string triCode { get; set; }
