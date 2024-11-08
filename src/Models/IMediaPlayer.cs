@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace NhlTvFetcher.Models {
     public interface IMediaPlayer {
-
         /// <summary>The command line alias of the media player, e.g. <c>mpv</c> or <c>vlc</c>.</summary>
         string AppName { get; set; }
 
@@ -16,7 +15,7 @@ namespace NhlTvFetcher.Models {
 
         /// <summary>The value used to set the title of the player's window.</summary>
         public string TitleParameterValue { get; set; }
-        
+
         /// <summary>The player's screen position parameter option name for tiling windows, e.g. <c>--geometry</c>.</summary>
         public string TiledScreenParameterName { get; set; }
 
@@ -34,22 +33,39 @@ namespace NhlTvFetcher.Models {
             string paramList = string.Join(" ",
                 Parameters.Select(x =>
                     x.Key +
-                    (!string.IsNullOrWhiteSpace(x.Value)
-                        ? $"={(x.Value.Contains(' ')
-                            ? $"'{x.Value}'"
-                            : $"{x.Value}")}"
-                        : ""
-                    )
+                    FormatParameterValue(x.Value)
                 )
             );
 
             if (TiledScreenParameterName != null &&
                 TiledScreenParameterValues != null) {
                 paramList +=
-                    $" {TiledScreenParameterName}={Session.GetScreenPosition(TiledScreenParameterValues)}";
+                    $" {TiledScreenParameterName}" +
+                    $"{FormatParameterValue(Session.GetScreenPosition(TiledScreenParameterValues))}";
+            }
+
+            if (TitleParameterName != null
+                && TitleParameterValue != null) {
+                paramList +=
+                    $" {TitleParameterName}" +
+                    $"{FormatParameterValue(TitleParameterValue)}";
             }
 
             return paramList;
+        }
+
+        /// <summary>
+        /// Formats a parameter value for use in command line execution.
+        /// </summary>
+        /// <param name="value">The string value of any given parameter name.</param>
+        /// <returns>The value, enclosed in single quotes if contains spaces; otherwise blank string.</returns>
+        private string FormatParameterValue(string value) {
+            return (!string.IsNullOrWhiteSpace(value)
+                    ? $"={(value.Contains(' ')
+                        ? $"'{value}'"
+                        : $"{value}")}"
+                    : ""
+                );
         }
     }
 
@@ -57,7 +73,6 @@ namespace NhlTvFetcher.Models {
         public string AppName { get; set; }
         public string TitleParameterName { get; set; }
         public string TitleParameterValue { get; set; }
-        public string Title { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
 
         public string TiledScreenParameterName { get; set; }
@@ -84,6 +99,7 @@ namespace NhlTvFetcher.Models {
             };
 
         public string TiledScreenParameterName { get; set; } = "--geometry";
+
         public List<string> TiledScreenParameterValues { get; set; } = [
             "50%+0+0", // top-left (50%)
             "50%+100%+0", // top-right (50%)
@@ -106,6 +122,7 @@ namespace NhlTvFetcher.Models {
             };
 
         public string TiledScreenParameterName { get; set; } = "--align";
+
         public List<string> TiledScreenParameterValues { get; set; } = [
             "5", // top-left
             "6", // top-right

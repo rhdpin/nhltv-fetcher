@@ -15,9 +15,9 @@ namespace NhlTvFetcher.Data {
         public override string ToString() {
             return $"{Date.ToString("ddd yyyy-MM-dd hh:mmtt")} " +
                    $"{Away}@{Home} " +
-                   $"({Type}) " +
-                   $"{(Broadcaster != null ? $"({Broadcaster}) " : "")}" +
-                   $"{(IsFrench ? "(FRENCH)" : "")}";
+                   $"({Type})" +
+                   $"{(Broadcaster != null ? $" ({Broadcaster}" : "")}" +
+                   $"{(IsFrench ? " (FRENCH)" : "")}";
         }
 
         /// <summary>
