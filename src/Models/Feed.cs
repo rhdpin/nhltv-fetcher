@@ -16,7 +16,7 @@ namespace NhlTvFetcher.Data {
             return $"{Date.ToString("ddd yyyy-MM-dd hh:mmtt")} " +
                    $"{Away}@{Home} " +
                    $"({Type})" +
-                   $"{(Broadcaster != null ? $" ({Broadcaster}" : "")}" +
+                   $"{(Broadcaster != null ? $" ({Broadcaster})" : "")}" +
                    $"{(IsFrench ? " (FRENCH)" : "")}";
         }
 
