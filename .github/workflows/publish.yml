@@ -1,8 +1,9 @@
 name: Publish
 
 on:
-  release:
-    types: [published]
+  [push]
+  #release:
+  #  types: [published]
 
 jobs:
   github:
@@ -25,7 +26,7 @@ jobs:
             target: osx-x64
     runs-on: ${{ matrix.os }}  
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -66,7 +67,7 @@ jobs:
             target: linux-x64          
     runs-on: ${{ matrix.os }}  
     steps:    
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build and push the image
       shell: bash
       run: |
