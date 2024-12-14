@@ -141,7 +141,7 @@ namespace NhlTvFetcher.Models.Json.Schedule
         public int id { get; set; }
         public string teaserType { get; set; }
         public string externalMatchId { get; set; }
-        public string path { get; set; }
+        
         public int playtime { get; set; }
         public object adBreaks { get; set; }
         public int skipSeconds { get; set; }
