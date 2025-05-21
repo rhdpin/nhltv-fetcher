@@ -12,7 +12,7 @@ namespace NhlTvFetcher
 {
     public class FeedFetcher
     {
-        public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36";        
+        public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0";        
         private readonly Messenger _messenger;
         private readonly Options _options;
 
