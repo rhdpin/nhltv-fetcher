@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using System.Runtime.InteropServices;
 
 namespace NhlTvFetcher
 {
@@ -33,6 +34,9 @@ namespace NhlTvFetcher
         
         [Option('p', "path", Required = false, HelpText = "(Default: current directory) Set target download path.")]
         public string TargetPath { get; set; }
+
+        [Option('r', "broadcaster", Required = false, HelpText = "(Default: none) Set preferred national broadcaster feed(s) if no suitable home/away feed is available. Used with -t parameter. Partial strings can be used too (e.g. ABC,TNT,ES)")]
+        public string Broadcasters { get; set; }
 
         [Option('s', "stream", Required = false, HelpText = "Create a stream of the feed to network. Connect to stream using URL shown in output.")]
         public bool Stream { get; set; }

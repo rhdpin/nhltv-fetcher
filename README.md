@@ -57,8 +57,8 @@ Authentication file (`auth.json`) must contain valid NHL.TV account email and pa
 ## Usage
 ```
 $ ./nhltv-fetcher --help
-nhltv-fetcher 1.0.12
-Copyright (C) 2023 rhdpin
+nhltv-fetcher 1.0.13
+Copyright (C) 2025 rhdpin
 
   -a, --auth-file-path    (Default: auth.json in current directory) Set full path of auth file
 
@@ -80,6 +80,8 @@ Copyright (C) 2023 rhdpin
 
   -p, --path              (Default: current directory) Set target download path.
 
+  -r, --broadcaster       (Default: none) Set preferred national broadcaster feed(s) if no suitable home/away feed is available. Used with -t parameter. Partial strings can be used too (e.g. ABC,TNT,ES)
+
   -s, --stream            Create a stream of the feed to network. Connect to stream using URL shown in output.
 
   -t, --team              Get latest game for team (three letter abbreviation. E.g. WPG).
@@ -96,7 +98,7 @@ Copyright (C) 2023 rhdpin
 Choose the feed from list of found feeds and download it in `/mnt/download`
 ```
 $ ./nhltv-fetcher -c -p /mnt/download
-nhltv-fetcher 1.0.12
+nhltv-fetcher 1.0.13
 
  1: Tue 22-12-27 CHI@CAR (home, BSSO)
  2: Tue 22-12-27 CHI@CAR (away, NBCSCH)

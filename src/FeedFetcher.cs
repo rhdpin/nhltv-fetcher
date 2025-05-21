@@ -61,6 +61,17 @@ namespace NhlTvFetcher
                     chosenFeed = latestStreams.FirstOrDefault(f => f.Type.Equals("away", StringComparison.OrdinalIgnoreCase) && !f.IsFrench);
             }
 
+            if (chosenFeed == null && _options.Broadcasters != null)
+            {
+                var preferredBroadcasters = _options.Broadcasters.Split(',');
+                foreach (var broadcaster in preferredBroadcasters)
+                {
+                    chosenFeed = latestStreams.FirstOrDefault(f => f.Broadcaster.Contains(broadcaster.Trim(), StringComparison.OrdinalIgnoreCase));
+                    if (chosenFeed != null)
+                        break;
+                }                
+            }
+
             chosenFeed ??= latestStreams.FirstOrDefault(f => f.Type == "national");
             chosenFeed ??= latestStreams.FirstOrDefault(f => !f.IsFrench);
 
